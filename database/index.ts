@@ -3,7 +3,7 @@ import { Administrador } from "./entity/Administrador";
 import { Donador } from "./entity/Donador";
 import { Turno } from "./entity/Donador";
 
-export const appDataSource = new DataSource({
+export const dataSource = new DataSource({
   type: "mysql",
   host: process.env.DBHOST ?? "localhost",
   port: parseInt(process.env.DBPORT ?? "3306"),
@@ -17,28 +17,21 @@ export const appDataSource = new DataSource({
   migrations: [],
 });
 
-export const connectDB = async () => {
-  try {
-    if (!appDataSource.isInitialized) {
-      await appDataSource.initialize();
-      console.log("db running");
-    }
-  } catch {
-    console.log("db not found");
-  }
+export const createDataSource = async () => {
+  return !dataSource.isInitialized ? await dataSource.initialize() : dataSource;
 };
 
-export const getRepoAdmins = async () => {
-  await connectDB();
-  return appDataSource.getRepository(Administrador);
+export const createRepoAdmins = async () => {
+  await createDataSource();
+  return dataSource.getRepository(Administrador);
 };
 
-export const getRepoTurnos = async () => {
-  await connectDB();
-  return appDataSource.getRepository(Turno);
+export const createRepoTurnos = async () => {
+  await createDataSource();
+  return dataSource.getRepository(Turno);
 };
 
-export const getRepoDonadores = async () => {
-  await connectDB();
-  return appDataSource.getRepository(Donador);
+export const createRepoDonadores = async () => {
+  await createDataSource();
+  return dataSource.getRepository(Donador);
 };
