@@ -3,20 +3,6 @@ import { Administrador } from "./entity/Administrador";
 import { Donador } from "./entity/Donador";
 import { Turno } from "./entity/Donador";
 
-export const dataSource = new DataSource({
-  type: "mysql",
-  host: process.env.DBHOST ?? "localhost",
-  port: parseInt(process.env.DBPORT ?? "3306"),
-  username: process.env.DBUSER ?? "root",
-  password: process.env.DBPASS ?? "pass",
-  database: process.env.DB ?? "test",
-  synchronize: true,
-  logging: true,
-  entities: [Administrador, Donador, Turno],
-  subscribers: [],
-  migrations: [],
-});
-
 export class App extends DataSource {
   private repoAdmin: Repository<Administrador>;
   constructor() {
