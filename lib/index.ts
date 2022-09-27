@@ -27,21 +27,9 @@ export class App extends DataSource {
     return !this.isInitialized ? await this.initialize() : this;
   }
 
-  async saveAdmin({
-    nombre,
-    apellido,
-    email,
-  }: {
-    nombre: string;
-    apellido: string;
-    email: string;
-  }) {
+  async saveAdmin(params: { nombre: string; apellido: string; email: string }) {
     await this.connectDataSource();
-    const admin = new Administrador();
-    admin.nombre = nombre;
-    admin.apellido = apellido;
-    admin.email = email;
-    await this.repoAdmin.save(admin);
+    const admin = await this.repoAdmin.save(params);
     return admin;
   }
 }

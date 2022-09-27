@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { app } from "../../database";
+import { app } from "../../lib";
 
 type Data = {
   id?: number;
@@ -20,7 +20,7 @@ export default async function handler(
         break;
 
       default:
-        res.status(400).json({});
+        res.status(405).json({});
         break;
     }
   } catch (error) {
