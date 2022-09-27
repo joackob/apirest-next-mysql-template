@@ -17,21 +17,47 @@ export const dataSource = new DataSource({
   migrations: [],
 });
 
-export const createDataSource = async () => {
-  return !dataSource.isInitialized ? await dataSource.initialize() : dataSource;
-};
+export class App extends DataSource {
+  private repoAdmin: Repository<Administrador>;
+  constructor() {
+    super({
+      type: "mysql",
+      host: process.env.DBHOST ?? "localhost",
+      port: parseInt(process.env.DBPORT ?? "3306"),
+      username: process.env.DBUSER ?? "root",
+      password: process.env.DBPASS ?? "pass",
+      database: process.env.DB ?? "test",
+      synchronize: true,
+      logging: true,
+      entities: [Administrador, Donador, Turno],
+      subscribers: [],
+      migrations: [],
+    });
 
-export const createRepoAdmins = async () => {
-  await createDataSource();
-  return dataSource.getRepository(Administrador);
-};
+    this.repoAdmin = this.getRepository(Administrador);
+  }
 
-export const createRepoTurnos = async () => {
-  await createDataSource();
-  return dataSource.getRepository(Turno);
-};
+  async connectDataSource() {
+    return !this.isInitialized ? await this.initialize() : this;
+  }
 
-export const createRepoDonadores = async () => {
-  await createDataSource();
-  return dataSource.getRepository(Donador);
-};
+  async saveAdmin({
+    nombre,
+    apellido,
+    email,
+  }: {
+    nombre: string;
+    apellido: string;
+    email: string;
+  }) {
+    await this.connectDataSource();
+    const admin = new Administrador();
+    admin.nombre = nombre;
+    admin.apellido = apellido;
+    admin.email = email;
+    await this.repoAdmin.save(admin);
+    return admin;
+  }
+}
+
+export const app = new App();
