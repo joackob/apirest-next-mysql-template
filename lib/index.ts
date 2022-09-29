@@ -1,4 +1,4 @@
-import { DataSource, Repository } from "typeorm";
+import { DataSource, FindOneOptions, Repository } from "typeorm";
 import { Administrador } from "./entity/Administrador";
 import { Donador } from "./entity/Donador";
 import { Turno } from "./entity/Donador";
@@ -30,6 +30,16 @@ export class App extends DataSource {
   async saveAdmin(params: { nombre: string; apellido: string; email: string }) {
     await this.connectDataSource();
     const admin = await this.repoAdmin.save(params);
+    return admin;
+  }
+  async updateAdmin(params: {
+    id: number;
+    nombre?: string;
+    apellido?: string;
+    email?: string;
+  }) {
+    await this.connectDataSource();
+    const admin = await this.repoAdmin.update(params.id, params);
     return admin;
   }
 }
