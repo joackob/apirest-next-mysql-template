@@ -66,7 +66,7 @@ npx create-next-app --example with-jest with-jest-app
 
 Ya con esto, podemos contar con todos los beneficios de `Typescript` y `Testing` en `NextJS`
 
-Dado que [TypeOrm](https://typeorm.io/) utiliza decoradores para trabajar, no esta de más empezar por configurar todo el entorno para ello. Y si de casualidad, usas inyección de dependencias, este [tutorial](https://himynameistim.com/blog/dependency-injection-with-nextjs-and-typescript) podría ser de mucha ayuda. Pero sino, simplemente instalamos `reflect-metada`
+Dado que [TypeOrm](https://typeorm.io/) utiliza decoradores para trabajar, no esta de más empezar por configurar todo el entorno para ello. Y si de casualidad, usas inyección de dependencias, este [tutorial](https://himynameistim.com/blog/dependency-injection-with-nextjs-and-typescript) podría ser de mucha ayuda. Pero sino, simplemente instalamos `reflect-metadata`
 
 ```bash
 npm install --save reflect-metadata
@@ -89,7 +89,7 @@ Instalamos algunos paquetes que lidiaran con la resolución de decoradores en `N
 npm install -D @babel/core @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators babel-plugin-transform-typescript-metadata
 ```
 
-Configuramos el archivo `.babelrc`. `NextJS` permite extender las funcionalidades mediante este archivo. Aquí un [tutorial](https://nextjs.org/docs/advanced-features/customizing-babel-config) por si te interesa el tema.
+Configuramos el archivo `.babelrc`. `NextJS` permite extender las funcionalidades mediante este archivo. Aquí un [tutorial](https://nextjs.org/docs/advanced-features/customizing-babel-config) por si te interesa el tema. Esto deshabilitara `swc` que es la plataforma de `nextjs` en versiones 12.3 en adelante. Por ende, cuando ejecutes el comando `npm run dev` es muy probable toparse con mensajes sobre este cambio. No asustarse.
 
 ```json
 {
