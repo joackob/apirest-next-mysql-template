@@ -1,7 +1,5 @@
-import { DataSource, FindOneOptions, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { Administrador } from "./entity/Administrador";
-import { Donador } from "./entity/Donador";
-import { Turno } from "./entity/Donador";
 
 export class App extends DataSource {
   private repoAdmin: Repository<Administrador>;
@@ -15,7 +13,7 @@ export class App extends DataSource {
       database: process.env.DB ?? "test",
       synchronize: true,
       logging: true,
-      entities: [Administrador, Donador, Turno],
+      entities: [Administrador],
       subscribers: [],
       migrations: [],
     });

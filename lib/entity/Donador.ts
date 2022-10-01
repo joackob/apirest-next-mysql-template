@@ -5,7 +5,6 @@ import {
   OneToMany,
   ManyToOne,
 } from "typeorm";
-import "reflect-metadata";
 
 @Entity()
 export class Donador {
