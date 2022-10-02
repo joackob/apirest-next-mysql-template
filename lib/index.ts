@@ -1,10 +1,16 @@
 import { DataSource, Repository } from "typeorm";
 import { Administrador } from "./entity/Administrador";
 
-export class App extends DataSource {
+type ResultAppOperation = {
+  affected: boolean;
+};
+
+export class App {
   private repoAdmin: Repository<Administrador>;
+  private repo: DataSource;
+
   constructor() {
-    super({
+    this.repo = new DataSource({
       type: "mysql",
       host: process.env.DBHOST ?? "localhost",
       port: parseInt(process.env.DBPORT ?? "3306"),
@@ -18,18 +24,20 @@ export class App extends DataSource {
       migrations: [],
     });
 
-    this.repoAdmin = this.getRepository(Administrador);
+    this.repoAdmin = this.repo.getRepository(Administrador);
   }
 
-  async connectDataSource() {
-    return !this.isInitialized ? await this.initialize() : this;
+  private async connectDataSource() {
+    return !this.repo.isInitialized ? await this.repo.initialize() : this.repo;
   }
 
   async saveAdmin(params: { nombre: string; apellido: string; email: string }) {
     await this.connectDataSource();
     const admin = await this.repoAdmin.save(params);
+
     return admin;
   }
+
   async updateAdmin(params: {
     id: number;
     nombre?: string;
@@ -37,8 +45,42 @@ export class App extends DataSource {
     email?: string;
   }) {
     await this.connectDataSource();
-    const admin = await this.repoAdmin.update(params.id, params);
-    return admin;
+    const res = await this.repoAdmin.update({ id: params.id }, params);
+    const affected: ResultAppOperation = {
+      affected: res.affected === 1,
+    };
+
+    return affected;
+  }
+
+  async destroy() {
+    await this.connectDataSource();
+    await this.repo.destroy();
+
+    return this;
+  }
+
+  async findAdmin(params: { id: number }) {
+    await this.connectDataSource();
+    const res = await this.repoAdmin.findOne({
+      where: {
+        id: params.id,
+      },
+    });
+
+    return res;
+  }
+
+  async deleteAdmin(params: { id: number }) {
+    await this.connectDataSource();
+    const res = await this.repoAdmin.delete({
+      id: params.id,
+    });
+    const affected: ResultAppOperation = {
+      affected: res.affected === 1,
+    };
+
+    return affected;
   }
 }
 
