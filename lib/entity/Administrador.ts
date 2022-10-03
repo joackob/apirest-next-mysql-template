@@ -5,12 +5,12 @@ export class Administrador {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @Column()
+  @Column({ nullable: false })
   nombre!: string;
 
-  @Column()
+  @Column({ nullable: false })
   apellido!: string;
 
-  @Column()
+  @Column({ nullable: false })
   email!: string;
 }

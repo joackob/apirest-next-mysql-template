@@ -1,73 +1,60 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmin } from "@/lib/RepoAdmin";
 
-type DataAdmin = {
-  id?: string;
-  nombre?: string;
-  apellido?: string;
-  email?: string;
+type GetDataResponse = {
+  id: string;
+  nombre: string;
+  apellido: string;
+  email: string;
 };
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<DataAdmin>
+  res: NextApiResponse
 ) {
-  const { method } = req;
   res.setHeader("Content-Type", "aplication/json");
-  switch (method) {
-    case "DELETE":
-      await deleteAdmin(req, res);
-      break;
-    case "PUT":
-      await updateAdmin(req, res);
-      break;
-    case "GET":
-      await getAdmin(req, res);
-      break;
-    default:
-      res.status(405).json({});
-      break;
+  const { method } = req;
+
+  try {
+    switch (method) {
+      case "DELETE":
+        await deleteAdmin(req, res);
+        break;
+      case "PUT":
+        await updateAdmin(req, res);
+        break;
+      case "GET":
+        await getAdmin(req, res);
+        break;
+      default:
+        res.status(405).json({});
+        break;
+    }
+  } catch (error) {
+    console.log(typeof error);
+    res.status(400).json({});
   }
 }
 
-const deleteAdmin = async (
-  req: NextApiRequest,
-  res: NextApiResponse<DataAdmin>
-) => {
-  try {
-    const id = req.query.id?.toString() ?? "";
-    const resultDelete = await repoAdmin.delete({ id });
-    res.status(resultDelete.affected ? 200 : 404).json({});
-  } catch (error) {
-    console.log(typeof error);
-    res.status(400).json({});
-  }
+const deleteAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
+  const id = req.query.id?.toString() ?? "";
+  const resultDelete = await repoAdmin.delete({ id });
+  res.status(resultDelete.affected ? 204 : 404).json({});
 };
 
-const updateAdmin = async (
-  req: NextApiRequest,
-  res: NextApiResponse<DataAdmin>
-) => {
-  try {
-    const id = req.query.id?.toString() ?? "";
-    const resultUpdate = await repoAdmin.update({ id, ...req.body });
-    res.status(resultUpdate.affected ? 200 : 404).json({});
-  } catch (error) {
-    console.log(typeof error);
-    res.status(400).json({});
-  }
+const updateAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
+  const id = req.query.id?.toString() ?? "";
+  const resultUpdate = await repoAdmin.update({ id, ...req.body });
+  res.status(resultUpdate.affected ? 204 : 404).json({});
 };
 
 const getAdmin = async (
   req: NextApiRequest,
-  res: NextApiResponse<DataAdmin>
+  res: NextApiResponse<GetDataResponse>
 ) => {
-  try {
-    const id = req.query.id?.toString() ?? "";
-    const admin = await repoAdmin.find({ id });
-    res.status(200).json({ id, ...admin });
-  } catch (error) {
-    console.log(typeof error);
-    res.status(400).json({});
-  }
+  const id = req.query.id?.toString() ?? "";
+  const result = await repoAdmin.find({ id });
+  const admin = result ?? { id: "", nombre: "", apellido: "", email: "" };
+  const statusCode = result === null ? 404 : 200;
+  res.status(statusCode).json(admin);
 };
