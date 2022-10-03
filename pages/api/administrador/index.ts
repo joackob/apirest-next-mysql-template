@@ -1,19 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { app } from "../../lib";
+import { repoAdmin } from "@/lib/RepoAdmin";
 
 type Data = {
-  id?: number;
-};
-
-const createAdmin = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  try {
-    const { nombre, apellido, email } = req.body;
-    const admin = await app.saveAdmin({ nombre, apellido, email });
-    res.status(200).json({ id: admin.id });
-  } catch (error) {
-    console.log(typeof error);
-    res.status(400).json({});
-  }
+  id?: string;
 };
 
 export default async function handler(
@@ -32,3 +21,14 @@ export default async function handler(
       break;
   }
 }
+
+const createAdmin = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+  try {
+    const { nombre, apellido, email } = req.body;
+    const admin = await repoAdmin.save({ nombre, apellido, email });
+    res.status(200).json({ id: admin.id });
+  } catch (error) {
+    console.log(typeof error);
+    res.status(400).json({});
+  }
+};
