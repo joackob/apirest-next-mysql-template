@@ -1,44 +1,47 @@
-import { RepoAdmin } from "../lib/RepoAdmin";
+import { RepoDonadores } from "../lib/RepoDonador";
 
-const repo = new RepoAdmin();
+const repo = new RepoDonadores();
 const dataToTest: {
   id: string;
   nombre: string;
   apellido: string;
   email: string;
+  telefono: string;
 } = {
   id: "1",
   nombre: "Juan",
   apellido: "Suarez",
   email: "jsuarez@etec.uba.ar",
+  telefono: "1112345678",
 };
 
-describe("Testing CRUD operations in repoAdmins", () => {
+describe("Testing CRUD operations in RepoDonadores", () => {
   beforeAll(async () => {
-    const admin = await repo.save({
+    const dono = await repo.save({
       nombre: dataToTest.nombre,
       apellido: dataToTest.apellido,
       email: dataToTest.email,
+      telefono: dataToTest.telefono,
     });
-    dataToTest.id = admin.id;
+    dataToTest.id = dono.id;
   });
 
   afterAll(async () => {
     return repo.destroy();
   });
 
-  test("Deberia poder encontrar un admin por su id", async () => {
-    const admin = await repo.find({ id: dataToTest.id });
-    expect(admin?.email).toEqual(dataToTest.email);
+  test("Deberia poder encontrar un donador por su id", async () => {
+    const dono = await repo.find({ id: dataToTest.id });
+    expect(dono?.email).toEqual(dataToTest.email);
   });
 
-  test("Deberia actualizar un admin según su id", async () => {
+  test("Deberia actualizar un donador según su id", async () => {
     await repo.update({
       id: dataToTest.id,
       nombre: "Jose",
     });
-    const admin = await repo.find({ id: dataToTest.id });
-    expect(admin?.nombre).toEqual("Jose");
+    const dono = await repo.find({ id: dataToTest.id });
+    expect(dono?.nombre).toEqual("Jose");
   });
 
   test("Deberia actualizar el nombre segun su id", async () => {
@@ -49,7 +52,7 @@ describe("Testing CRUD operations in repoAdmins", () => {
     expect(res.affected).toBeTruthy();
   });
 
-  test("Deberia eliminarse el admin segun su id", async () => {
+  test("Deberia eliminarse el donador segun su id", async () => {
     const res = await repo.delete({ id: dataToTest.id });
     expect(res.affected).toBeTruthy();
   });

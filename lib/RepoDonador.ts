@@ -1,5 +1,5 @@
 import { DataSource, InsertResult, Repository } from "typeorm";
-import { Donador } from "./entity/DonadorTurno";
+import { Donador, Turno } from "./entity/DonadorTurno";
 
 type ResultUpdate = {
   affected: boolean;
@@ -21,7 +21,7 @@ export class RepoDonadores {
       database: process.env.DB ?? "test",
       synchronize: true,
       logging: true,
-      entities: [Donador],
+      entities: [Donador, Turno],
       subscribers: [],
       migrations: [],
     });
@@ -53,7 +53,7 @@ export class RepoDonadores {
     nombre?: string;
     apellido?: string;
     email?: string;
-    telefono: string;
+    telefono?: string;
   }) {
     await this.initialize();
     const res = await this.repo.update({ id: params.id }, params);
