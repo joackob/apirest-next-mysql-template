@@ -1,19 +1,19 @@
 import { RepoAdmin } from "../lib/RepoAdmin";
 
-const repo = new RepoAdmin();
-const dataToTest: {
-  id: string;
-  nombre: string;
-  apellido: string;
-  email: string;
-} = {
-  id: "1",
-  nombre: "Juan",
-  apellido: "Suarez",
-  email: "jsuarez@etec.uba.ar",
-};
-
 describe("Testing CRUD operations in repoAdmins", () => {
+  const repo = new RepoAdmin();
+  const dataToTest: {
+    id: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+  } = {
+    id: "1",
+    nombre: "Juan",
+    apellido: "Suarez",
+    email: "jsuarez@etec.uba.ar",
+  };
+
   beforeAll(async () => {
     const admin = await repo.save({
       nombre: dataToTest.nombre,

@@ -1,11 +1,13 @@
-import { DataSource, InsertResult, Repository } from "typeorm";
-import { Donador, Turno } from "./entity/DonadorTurno";
+import { DataSource, Repository } from "typeorm";
+import { Donador } from "./entity/Donador";
 
 type ResultUpdate = {
-  affected: boolean;
+  updated: boolean;
 };
 
-type ResultDelete = ResultUpdate;
+type ResultDelete = {
+  removed: boolean;
+};
 
 export class RepoDonadores {
   private repo: Repository<Donador>;
@@ -21,7 +23,7 @@ export class RepoDonadores {
       database: process.env.DB ?? "test",
       synchronize: true,
       logging: true,
-      entities: [Donador, Turno],
+      entities: [Donador],
       subscribers: [],
       migrations: [],
     });
@@ -48,6 +50,12 @@ export class RepoDonadores {
     return donor;
   }
 
+  async destroy() {
+    await this.initialize();
+    this.dataSource.destroy();
+    return this;
+  }
+
   async update(params: {
     id: string;
     nombre?: string;
@@ -58,27 +66,21 @@ export class RepoDonadores {
     await this.initialize();
     const res = await this.repo.update({ id: params.id }, params);
     const affected: ResultUpdate = {
-      affected: res.affected === 1,
+      updated: res.affected === 1,
     };
 
     return affected;
   }
 
-  async destroy() {
-    await this.initialize();
-    this.dataSource.destroy();
-    return this;
-  }
-
   async find(params: { id: string }) {
     await this.initialize();
-    const res = await this.repo.findOne({
+    const donor = await this.repo.findOne({
       where: {
         id: params.id,
       },
     });
 
-    return res;
+    return donor;
   }
 
   async findAll() {
@@ -93,7 +95,7 @@ export class RepoDonadores {
       id: params.id,
     });
     const affected: ResultDelete = {
-      affected: res.affected === 1,
+      removed: res.affected === 1,
     };
 
     return affected;

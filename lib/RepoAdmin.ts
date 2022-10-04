@@ -2,10 +2,12 @@ import { DataSource, Repository } from "typeorm";
 import { Administrador } from "./entity/Administrador";
 
 type ResultUpdate = {
-  affected: boolean;
+  updated: boolean;
 };
 
-type ResultDelete = ResultUpdate;
+type ResultDelete = {
+  removed: boolean;
+};
 
 export class RepoAdmin {
   private repo: Repository<Administrador>;
@@ -52,7 +54,7 @@ export class RepoAdmin {
     await this.initialize();
     const res = await this.repo.update({ id: params.id }, params);
     const affected: ResultUpdate = {
-      affected: res.affected === 1,
+      updated: res.affected === 1,
     };
 
     return affected;
@@ -87,7 +89,7 @@ export class RepoAdmin {
       id: params.id,
     });
     const affected: ResultDelete = {
-      affected: res.affected === 1,
+      removed: res.affected === 1,
     };
 
     return affected;

@@ -22,19 +22,4 @@ export class Donador {
 
   @Column({ nullable: false })
   telefono!: string;
-
-  @OneToMany(() => Turno, (turno) => turno.donador)
-  turnos!: Turno[];
-}
-
-@Entity()
-export class Turno {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
-  @Column({ type: "timestamp", nullable: false })
-  fecha!: string;
-
-  @ManyToOne(() => Donador, (donador) => donador.turnos)
-  donador!: Donador;
 }

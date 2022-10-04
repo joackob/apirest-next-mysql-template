@@ -1,21 +1,21 @@
 import { RepoDonadores } from "../lib/RepoDonador";
 
-const repo = new RepoDonadores();
-const dataToTest: {
-  id: string;
-  nombre: string;
-  apellido: string;
-  email: string;
-  telefono: string;
-} = {
-  id: "1",
-  nombre: "Juan",
-  apellido: "Suarez",
-  email: "jsuarez@etec.uba.ar",
-  telefono: "1112345678",
-};
-
 describe("Testing CRUD operations in RepoDonadores", () => {
+  const repo = new RepoDonadores();
+  const dataToTest: {
+    id: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+    telefono: string;
+  } = {
+    id: "1",
+    nombre: "Juan",
+    apellido: "Suarez",
+    email: "jsuarez@etec.uba.ar",
+    telefono: "1112345678",
+  };
+
   beforeAll(async () => {
     const dono = await repo.save({
       nombre: dataToTest.nombre,
