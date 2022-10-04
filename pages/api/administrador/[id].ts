@@ -6,7 +6,7 @@ type GetDataResponse = {
   nombre: string;
   apellido: string;
   email: string;
-};
+} | null;
 
 export default async function handler(
   req: NextApiRequest,
@@ -53,8 +53,7 @@ const getAdmin = async (
   res: NextApiResponse<GetDataResponse>
 ) => {
   const id = req.query.id?.toString() ?? "";
-  const result = await repoAdmin.find({ id });
-  const admin = result ?? { id: "", nombre: "", apellido: "", email: "" };
-  const statusCode = result === null ? 404 : 200;
+  const admin = await repoAdmin.find({ id });
+  const statusCode = admin ? 404 : 200;
   res.status(statusCode).json(admin);
 };

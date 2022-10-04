@@ -34,5 +34,8 @@ const createAdmin = async (
 ) => {
   const { nombre, apellido, email } = req.body;
   const admin = await repoAdmin.save({ nombre, apellido, email });
-  res.status(200).json({ id: admin.id });
+  res
+    .status(201)
+    .setHeader("Location", `/administrador/${admin.id}`)
+    .json({ id: admin.id });
 };

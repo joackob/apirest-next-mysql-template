@@ -9,18 +9,18 @@ import {
 @Entity()
 export class Donador {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: string;
 
-  @Column()
+  @Column({ nullable: false })
   nombre!: string;
 
-  @Column()
+  @Column({ nullable: false })
   apellido!: string;
 
-  @Column()
+  @Column({ nullable: false })
   email!: string;
 
-  @Column()
+  @Column({ nullable: false })
   telefono!: string;
 
   @OneToMany(() => Turno, (turno) => turno.donador)
@@ -32,7 +32,7 @@ export class Turno {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "timestamp", nullable: false })
   fecha!: string;
 
   @ManyToOne(() => Donador, (donador) => donador.turnos)
