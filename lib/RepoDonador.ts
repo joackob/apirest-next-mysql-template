@@ -9,6 +9,10 @@ type ResultDelete = {
   removed: boolean;
 };
 
+type ResultSave = {
+  id: string;
+};
+
 export class RepoDonadores {
   private repo: Repository<Donador>;
   private dataSource: DataSource;
@@ -46,13 +50,20 @@ export class RepoDonadores {
     telefono: string;
   }) {
     await this.initialize();
-    const donor = await this.repo.save(params);
-    return donor;
+    const resultSearch = await this.repo
+      .createQueryBuilder("admin")
+      .where("admin.email = :email", { email: params.email })
+      .getOne();
+    const donor = resultSearch ?? (await this.repo.save(params));
+    const result: ResultSave = {
+      id: donor.id,
+    };
+    return result;
   }
 
   async destroy() {
     await this.initialize();
-    this.dataSource.destroy();
+    await this.dataSource.destroy();
     return this;
   }
 

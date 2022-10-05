@@ -46,11 +46,11 @@ describe("Testing CRUD operations in repoAdmins", () => {
       id: dataToTest.id,
       nombre: "Jose",
     });
-    expect(res.affected).toBeTruthy();
+    expect(res.updated).toBeTruthy();
   });
 
   test("Deberia eliminarse el admin segun su id", async () => {
     const res = await repo.delete({ id: dataToTest.id });
-    expect(res.affected).toBeTruthy();
+    expect(res.removed).toBeTruthy();
   });
 });

@@ -1,9 +1,11 @@
 import { RepoTurnos } from "../lib/RepoTurnos";
+import { RepoDonadores } from "../lib/RepoDonador";
 
 describe("Testing CRUD operations in RepoDonadores", () => {
-  const repo = new RepoTurnos();
+  const repoTurns = new RepoTurnos();
+  const repoDonors = new RepoDonadores();
   const dataToTest: {
-    id?: string;
+    idTurn?: string;
     fecha: string;
     idDono?: string;
     nombre: string;
@@ -11,7 +13,7 @@ describe("Testing CRUD operations in RepoDonadores", () => {
     email: string;
     telefono: string;
   } = {
-    fecha: "2022-12-12 13:00:00",
+    fecha: new Date().toISOString().slice(0, 19).replace("T", " "),
     nombre: "Juan",
     apellido: "Suarez",
     email: "jsuarez@etec.uba.ar",
@@ -19,18 +21,23 @@ describe("Testing CRUD operations in RepoDonadores", () => {
   };
 
   beforeAll(async () => {
-    const result = await repo.reserve({
+    const result = await repoTurns.reserve({
       nombre: dataToTest.nombre,
       apellido: dataToTest.apellido,
       email: dataToTest.email,
       telefono: dataToTest.telefono,
       fecha: dataToTest.fecha,
     });
-    dataToTest.id = result.turnID;
+    dataToTest.idTurn = result.turnID;
     dataToTest.idDono = result.donorID;
   });
 
   afterAll(async () => {
-    return repo.destroy();
+    return repoTurns.destroy();
+  });
+
+  test("Deberia existir un donador asociado a un turno", async () => {
+    const donor = await repoDonors.find({ id: dataToTest.idDono ?? "" });
+    expect(donor?.nombre).toEqual("Juan");
   });
 });

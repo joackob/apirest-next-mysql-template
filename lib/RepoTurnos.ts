@@ -42,13 +42,10 @@ export class RepoTurnos {
 
   async destroy() {
     await this.initialize();
-    this.dataSource.destroy();
+    await this.dataSource.destroy();
     return this;
   }
 
-  /* Permite crear un turno, creando un donador adjunto.
-  Si el donador ya existe, le adjudica el turno
-  */
   async reserve(params: {
     nombre: string;
     apellido: string;
@@ -60,7 +57,6 @@ export class RepoTurnos {
     const resultSearch = await this.repoDonors
       .createQueryBuilder("donor")
       .where("donor.email = :email", { email: params.email })
-      .orWhere("donor.telefono = :telefono", { telefono: params.telefono })
       .getOne();
 
     const donor =

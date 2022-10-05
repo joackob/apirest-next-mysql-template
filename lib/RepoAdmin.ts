@@ -9,6 +9,10 @@ type ResultDelete = {
   removed: boolean;
 };
 
+type ResultSave = {
+  id: string;
+};
+
 export class RepoAdmin {
   private repo: Repository<Administrador>;
   private dataSource: DataSource;
@@ -41,8 +45,15 @@ export class RepoAdmin {
 
   async save(params: { nombre: string; apellido: string; email: string }) {
     await this.initialize();
-    const admin = await this.repo.save(params);
-    return admin;
+    const resultSearch = await this.repo
+      .createQueryBuilder("admin")
+      .where("admin.email = :email", { email: params.email })
+      .getOne();
+    const admin = resultSearch ?? (await this.repo.save(params));
+    const result: ResultSave = {
+      id: admin.id,
+    };
+    return result;
   }
 
   async update(params: {
@@ -62,7 +73,7 @@ export class RepoAdmin {
 
   async destroy() {
     await this.initialize();
-    this.dataSource.destroy();
+    await this.dataSource.destroy();
     return this;
   }
 

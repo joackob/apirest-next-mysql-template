@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  ManyToOne,
-} from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Donador {
@@ -17,7 +11,7 @@ export class Donador {
   @Column({ nullable: false })
   apellido!: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   email!: string;
 
   @Column({ nullable: false })

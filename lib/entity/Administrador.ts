@@ -11,6 +11,6 @@ export class Administrador {
   @Column({ nullable: false })
   apellido!: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   email!: string;
 }
