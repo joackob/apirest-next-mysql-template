@@ -108,6 +108,23 @@ export class RepoTurnos {
 
     return result;
   }
+
+  async getReservedByDate(params: { date: string }) {
+    const date = new Date(params.date);
+    const turns = await this.repoTurns
+      .createQueryBuilder("turn")
+      .where("year(turn.fecha) = :year", {
+        year: date.getFullYear(),
+      })
+      .andWhere("month(turn.fecha) = :month", {
+        month: date.getMonth() + 1,
+      })
+      .andWhere("day(turn.fecha) = :day", {
+        day: date.getDate(),
+      })
+      .getMany();
+    return turns;
+  }
 }
 
 export const repoTurnos = new RepoTurnos();

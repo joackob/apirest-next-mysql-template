@@ -44,4 +44,10 @@ describe("Testing CRUD operations in RepoDonadores", () => {
     const donor = await repoDonors.findByID({ id: dataToTest.idDono ?? "" });
     expect(donor?.nombre).toEqual("Jorge");
   });
+
+  test("Deberia existir al menos un turno reservado para hoy", async () => {
+    const today = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const turns = await repoTurns.getReservedByDate({ date: today });
+    expect(turns?.length).toBeGreaterThanOrEqual(1);
+  });
 });
