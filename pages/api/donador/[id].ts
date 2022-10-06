@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { repoDonadores } from "@/lib/RepoDonador";
+import { repoDonadores } from "@/lib/RepoDonadores";
 
 type GetDataResponse = {
   id: string;
@@ -39,13 +39,13 @@ export default async function handler(
 
 const deleteAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id?.toString() ?? "";
-  const resultDelete = await repoDonadores.delete({ id });
+  const resultDelete = await repoDonadores.deleteByID({ id });
   res.status(resultDelete.removed ? 204 : 404).json({});
 };
 
 const updateAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id?.toString() ?? "";
-  const resultUpdate = await repoDonadores.update({ id, ...req.body });
+  const resultUpdate = await repoDonadores.updateByID({ id, ...req.body });
   res.status(resultUpdate.updated ? 204 : 404).json({});
 };
 
@@ -54,7 +54,7 @@ const getAdmin = async (
   res: NextApiResponse<GetDataResponse>
 ) => {
   const id = req.query.id?.toString() ?? "";
-  const donor = await repoDonadores.find({ id });
+  const donor = await repoDonadores.findByID({ id });
   const statusCode = donor ? 404 : 200;
   res.status(statusCode).json(donor);
 };

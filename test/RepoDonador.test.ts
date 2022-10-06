@@ -1,4 +1,4 @@
-import { RepoDonadores } from "../lib/RepoDonador";
+import { RepoDonadores } from "../lib/RepoDonadores";
 
 describe("Testing CRUD operations in RepoDonadores", () => {
   const repo = new RepoDonadores();
@@ -6,12 +6,14 @@ describe("Testing CRUD operations in RepoDonadores", () => {
     id: string;
     nombre: string;
     apellido: string;
+    dni: string;
     email: string;
     telefono: string;
   } = {
     id: "1",
     nombre: "Juan",
     apellido: "Suarez",
+    dni: "30123456",
     email: "jsuarez@etec.uba.ar",
     telefono: "1112345678",
   };
@@ -20,6 +22,7 @@ describe("Testing CRUD operations in RepoDonadores", () => {
     const dono = await repo.save({
       nombre: dataToTest.nombre,
       apellido: dataToTest.apellido,
+      dni: dataToTest.dni,
       email: dataToTest.email,
       telefono: dataToTest.telefono,
     });
@@ -31,21 +34,21 @@ describe("Testing CRUD operations in RepoDonadores", () => {
   });
 
   test("Deberia poder encontrar un donador por su id", async () => {
-    const dono = await repo.find({ id: dataToTest.id });
+    const dono = await repo.findByID({ id: dataToTest.id });
     expect(dono?.email).toEqual(dataToTest.email);
   });
 
   test("Deberia actualizar un donador según su id", async () => {
-    await repo.update({
+    await repo.updateByID({
       id: dataToTest.id,
       nombre: "Jose",
     });
-    const dono = await repo.find({ id: dataToTest.id });
+    const dono = await repo.findByID({ id: dataToTest.id });
     expect(dono?.nombre).toEqual("Jose");
   });
 
   test("Deberia actualizar el nombre segun su id", async () => {
-    const res = await repo.update({
+    const res = await repo.updateByID({
       id: dataToTest.id,
       nombre: "Jose",
     });
@@ -53,7 +56,7 @@ describe("Testing CRUD operations in RepoDonadores", () => {
   });
 
   test("Deberia eliminarse el donador segun su id", async () => {
-    const res = await repo.delete({ id: dataToTest.id });
+    const res = await repo.deleteByID({ id: dataToTest.id });
     expect(res.removed).toBeTruthy();
   });
 });

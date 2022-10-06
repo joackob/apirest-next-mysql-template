@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { repoAdmin } from "@/lib/RepoAdmin";
+import { repoAdmins } from "@/lib/RepoAdmins";
 
 type GetDataResponse = {
   admins: {
@@ -35,7 +35,7 @@ const getAdmins = async (
   req: NextApiRequest,
   res: NextApiResponse<GetDataResponse>
 ) => {
-  const admins = await repoAdmin.findAll();
+  const admins = await repoAdmins.findAll();
   res.status(200).json({
     admins,
   });

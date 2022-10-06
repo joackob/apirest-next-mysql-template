@@ -1,5 +1,5 @@
 import { RepoTurnos } from "../lib/RepoTurnos";
-import { RepoDonadores } from "../lib/RepoDonador";
+import { RepoDonadores } from "../lib/RepoDonadores";
 
 describe("Testing CRUD operations in RepoDonadores", () => {
   const repoTurns = new RepoTurnos();
@@ -10,13 +10,15 @@ describe("Testing CRUD operations in RepoDonadores", () => {
     idDono?: string;
     nombre: string;
     apellido: string;
+    dni: string;
     email: string;
     telefono: string;
   } = {
     fecha: new Date().toISOString().slice(0, 19).replace("T", " "),
-    nombre: "Juan",
-    apellido: "Suarez",
-    email: "jsuarez@etec.uba.ar",
+    nombre: "Jorge",
+    apellido: "Lopez",
+    dni: "30654321",
+    email: "jlopez@etec.uba.ar",
     telefono: "1112345678",
   };
 
@@ -24,6 +26,7 @@ describe("Testing CRUD operations in RepoDonadores", () => {
     const result = await repoTurns.reserve({
       nombre: dataToTest.nombre,
       apellido: dataToTest.apellido,
+      dni: dataToTest.dni,
       email: dataToTest.email,
       telefono: dataToTest.telefono,
       fecha: dataToTest.fecha,
@@ -33,11 +36,12 @@ describe("Testing CRUD operations in RepoDonadores", () => {
   });
 
   afterAll(async () => {
+    await repoDonors.destroy();
     return repoTurns.destroy();
   });
 
   test("Deberia existir un donador asociado a un turno", async () => {
-    const donor = await repoDonors.find({ id: dataToTest.idDono ?? "" });
-    expect(donor?.nombre).toEqual("Juan");
+    const donor = await repoDonors.findByID({ id: dataToTest.idDono ?? "" });
+    expect(donor?.nombre).toEqual("Jorge");
   });
 });

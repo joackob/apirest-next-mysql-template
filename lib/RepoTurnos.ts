@@ -49,6 +49,7 @@ export class RepoTurnos {
   async reserve(params: {
     nombre: string;
     apellido: string;
+    dni: string;
     email: string;
     telefono: string;
     fecha: string;
@@ -57,6 +58,7 @@ export class RepoTurnos {
     const resultSearch = await this.repoDonors
       .createQueryBuilder("donor")
       .where("donor.email = :email", { email: params.email })
+      .orWhere("donor.dni = :dni", { dni: params.dni })
       .getOne();
 
     const donor =
@@ -64,6 +66,7 @@ export class RepoTurnos {
       (await this.repoDonors.save({
         nombre: params.nombre,
         apellido: params.apellido,
+        dni: params.dni,
         email: params.email,
         telefono: params.telefono,
       }));

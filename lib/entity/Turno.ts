@@ -10,7 +10,7 @@ export class Turno {
   fecha!: string;
 
   @ManyToOne(() => Donador, {
-    cascade: true,
+    onDelete: "CASCADE",
   })
   donador!: Donador;
 }

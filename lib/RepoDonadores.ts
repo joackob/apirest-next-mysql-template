@@ -1,5 +1,5 @@
 import { DataSource, Repository } from "typeorm";
-import { Administrador } from "./entity/Administrador";
+import { Donador } from "./entity/Donador";
 
 type ResultUpdate = {
   updated: boolean;
@@ -13,8 +13,8 @@ type ResultSave = {
   id: string;
 };
 
-export class RepoAdmin {
-  private repo: Repository<Administrador>;
+export class RepoDonadores {
+  private repo: Repository<Donador>;
   private dataSource: DataSource;
 
   constructor() {
@@ -27,12 +27,12 @@ export class RepoAdmin {
       database: process.env.DB ?? "test",
       synchronize: true,
       logging: true,
-      entities: [Administrador],
+      entities: [Donador],
       subscribers: [],
       migrations: [],
     });
 
-    this.repo = this.dataSource.getRepository(Administrador);
+    this.repo = this.dataSource.getRepository(Donador);
   }
 
   async initialize() {
@@ -43,24 +43,39 @@ export class RepoAdmin {
     return this;
   }
 
-  async save(params: { nombre: string; apellido: string; email: string }) {
+  async save(params: {
+    nombre: string;
+    apellido: string;
+    dni: string;
+    email: string;
+    telefono: string;
+  }) {
     await this.initialize();
     const resultSearch = await this.repo
-      .createQueryBuilder("admin")
-      .where("admin.email = :email", { email: params.email })
+      .createQueryBuilder("donor")
+      .where("donor.email = :email", { email: params.email })
+      .orWhere("donor.dni = :dni", { dni: params.dni })
       .getOne();
-    const admin = resultSearch ?? (await this.repo.save(params));
+    const donor = resultSearch ?? (await this.repo.save(params));
     const result: ResultSave = {
-      id: admin.id,
+      id: donor.id,
     };
     return result;
   }
 
-  async update(params: {
+  async destroy() {
+    await this.initialize();
+    await this.dataSource.destroy();
+    return this;
+  }
+
+  async updateByID(params: {
     id: string;
     nombre?: string;
     apellido?: string;
+    dni?: string;
     email?: string;
+    telefono?: string;
   }) {
     await this.initialize();
     const res = await this.repo.update({ id: params.id }, params);
@@ -71,21 +86,15 @@ export class RepoAdmin {
     return affected;
   }
 
-  async destroy() {
+  async findByID(params: { id: string }) {
     await this.initialize();
-    await this.dataSource.destroy();
-    return this;
-  }
-
-  async find(params: { id: string }) {
-    await this.initialize();
-    const admin = await this.repo.findOne({
+    const donor = await this.repo.findOne({
       where: {
         id: params.id,
       },
     });
 
-    return admin;
+    return donor;
   }
 
   async findAll() {
@@ -94,7 +103,7 @@ export class RepoAdmin {
     return admins;
   }
 
-  async delete(params: { id: string }) {
+  async deleteByID(params: { id: string }) {
     await this.initialize();
     const res = await this.repo.delete({
       id: params.id,
@@ -107,4 +116,4 @@ export class RepoAdmin {
   }
 }
 
-export const repoAdmin = new RepoAdmin();
+export const repoDonadores = new RepoDonadores();

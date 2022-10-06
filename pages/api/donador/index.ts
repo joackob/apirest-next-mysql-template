@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { repoAdmin } from "@/lib/RepoAdmin";
+import { repoDonadores } from "@/lib/RepoDonadores";
 
 type PostDataResponse = {
   id: string;
@@ -32,8 +32,14 @@ const createAdmin = async (
   req: NextApiRequest,
   res: NextApiResponse<PostDataResponse>
 ) => {
-  const { nombre, apellido, email } = req.body;
-  const admin = await repoAdmin.save({ nombre, apellido, email });
+  const { nombre, apellido, dni, email, telefono } = req.body;
+  const admin = await repoDonadores.save({
+    nombre,
+    apellido,
+    dni,
+    email,
+    telefono,
+  });
   res
     .status(201)
     .setHeader("Location", `/administrador/${admin.id}`)

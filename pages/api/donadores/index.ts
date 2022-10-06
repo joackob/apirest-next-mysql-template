@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { repoDonadores } from "@/lib/RepoDonador";
+import { repoDonadores } from "@/lib/RepoDonadores";
 
 type GetDataResponse = {
   donors: {

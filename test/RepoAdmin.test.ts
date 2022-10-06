@@ -1,7 +1,7 @@
-import { RepoAdmin } from "../lib/RepoAdmin";
+import { RepoAdmins } from "../lib/RepoAdmins";
 
 describe("Testing CRUD operations in repoAdmins", () => {
-  const repo = new RepoAdmin();
+  const repo = new RepoAdmins();
   const dataToTest: {
     id: string;
     nombre: string;
@@ -28,21 +28,21 @@ describe("Testing CRUD operations in repoAdmins", () => {
   });
 
   test("Deberia poder encontrar un admin por su id", async () => {
-    const admin = await repo.find({ id: dataToTest.id });
+    const admin = await repo.findByID({ id: dataToTest.id });
     expect(admin?.email).toEqual(dataToTest.email);
   });
 
   test("Deberia actualizar un admin según su id", async () => {
-    await repo.update({
+    await repo.updateByID({
       id: dataToTest.id,
       nombre: "Jose",
     });
-    const admin = await repo.find({ id: dataToTest.id });
+    const admin = await repo.findByID({ id: dataToTest.id });
     expect(admin?.nombre).toEqual("Jose");
   });
 
   test("Deberia actualizar el nombre segun su id", async () => {
-    const res = await repo.update({
+    const res = await repo.updateByID({
       id: dataToTest.id,
       nombre: "Jose",
     });
@@ -50,7 +50,7 @@ describe("Testing CRUD operations in repoAdmins", () => {
   });
 
   test("Deberia eliminarse el admin segun su id", async () => {
-    const res = await repo.delete({ id: dataToTest.id });
+    const res = await repo.deleteByID({ id: dataToTest.id });
     expect(res.removed).toBeTruthy();
   });
 });

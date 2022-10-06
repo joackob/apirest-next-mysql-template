@@ -12,6 +12,9 @@ export class Donador {
   apellido!: string;
 
   @Column({ nullable: false, unique: true })
+  dni!: string;
+
+  @Column({ nullable: false, unique: true })
   email!: string;
 
   @Column({ nullable: false })
