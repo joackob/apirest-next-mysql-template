@@ -4,9 +4,10 @@ import { RepoDonadores } from "../lib/RepoDonadores";
 describe("Testing CRUD operations in RepoDonadores", () => {
   const repoTurns = new RepoTurnos();
   const repoDonors = new RepoDonadores();
+  const today = new Date();
   const dataToTest: {
     idTurn?: string;
-    fecha: string;
+    fecha: Date;
     idDono?: string;
     nombre: string;
     apellido: string;
@@ -14,7 +15,7 @@ describe("Testing CRUD operations in RepoDonadores", () => {
     email: string;
     telefono: string;
   } = {
-    fecha: new Date().toISOString().slice(0, 19).replace("T", " "),
+    fecha: today,
     nombre: "Jorge",
     apellido: "Lopez",
     dni: "30654321",
@@ -46,8 +47,12 @@ describe("Testing CRUD operations in RepoDonadores", () => {
   });
 
   test("Deberia existir al menos un turno reservado para hoy", async () => {
-    const today = new Date().toISOString().slice(0, 19).replace("T", " ");
-    const turns = await repoTurns.getReservedByDate({ date: today });
+    const turns = await repoTurns.getBooked({ date: today });
+    expect(turns?.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test("Deberian existir mas de un turno disponible para hoy ", async () => {
+    const turns = await repoTurns.getAvailable({ date: today });
     expect(turns?.length).toBeGreaterThanOrEqual(1);
   });
 });

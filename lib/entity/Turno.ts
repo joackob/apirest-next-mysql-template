@@ -7,7 +7,7 @@ export class Turno {
   id!: string;
 
   @Column({ type: "timestamp", nullable: false })
-  fecha!: string;
+  fecha!: Date;
 
   @ManyToOne(() => Donador, {
     onDelete: "CASCADE",
