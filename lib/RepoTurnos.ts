@@ -1,6 +1,14 @@
-import { DataSource, MetadataAlreadyExistsError, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { Turno } from "./entity/Turno";
 import { Donador } from "./entity/Donador";
+
+const DURATION_SESSION_IN_HOURS = 2;
+const SCHEDULE_FIRST_SESSION = 8;
+const SCHEDULE_LAST_SESSION = 17;
+const NUMBER_OF_DONORS_BY_SESSION = 3;
+const NUMBER_OF_SESSIONS = Math.floor(
+  (SCHEDULE_LAST_SESSION - SCHEDULE_FIRST_SESSION) / DURATION_SESSION_IN_HOURS
+);
 
 type ResultReserve = {
   reserved: boolean;
@@ -46,6 +54,13 @@ export class RepoTurnos {
     return this;
   }
 
+  /*
+    Reserva un turno para un donador. 
+    El horario para reservar debe estar disponible.
+    Si el donador no existe en el sistema, se crea uno nuevo.
+    Si el mismo donador ya reservo turno para el dia de la fecha,
+    entonces se actualiza el turno, no se crea uno nuevo
+  */
   async reserve(params: {
     nombre: string;
     apellido: string;
@@ -56,29 +71,24 @@ export class RepoTurnos {
   }) {
     await this.initialize();
 
-    /*
-    Se tienen que respetar las siguientes precondiciones
-    El horario para reservar debe estar disponible.
-    Si el donador ya existe en el sistema, se reusa sino se recrea.
-    Si el mismo donador ya reservo fecha para el dia de la fecha,
-    entonces se actualiza el turno, no se crea uno nuevo
-    */
+    const { email, dni } = params;
 
-    const donorFound = await this.repoDonors
-      .createQueryBuilder("donor")
-      .where("donor.email = :email", { email: params.email })
-      .orWhere("donor.dni = :dni", { dni: params.dni })
-      .getOne();
+    const donorFound = await this.repoDonors.findOne({
+      where: [{ email }, { dni }],
+    });
 
-    const donor =
-      donorFound ??
-      (await this.repoDonors.save({
-        nombre: params.nombre,
-        apellido: params.apellido,
-        dni: params.dni,
-        email: params.email,
-        telefono: params.telefono,
-      }));
+    const { nombre, apellido, telefono } = params;
+
+    const saveDonor = async () =>
+      await this.repoDonors.save({
+        nombre,
+        apellido,
+        dni,
+        email,
+        telefono,
+      });
+
+    const donor = donorFound ?? (await saveDonor());
 
     const turn = await this.repoTurns.save({
       fecha: params.fecha,
@@ -86,14 +96,15 @@ export class RepoTurnos {
     });
 
     const result: ResultReserve = {
-      reserved: true,
-      donorID: donor.id,
-      turnID: turn.id,
+      reserved: turn && donor ? true : false,
+      donorID: donor?.id,
+      turnID: turn?.id,
     };
 
     return result;
   }
 
+  /* Reserva un turno asociado a un donador segun su id */
   async reserveByDonorID(params: { donorId: string; date: string }) {
     await this.initialize();
     const donor = await this.repoDonors.findOne({
@@ -102,12 +113,13 @@ export class RepoTurnos {
       },
     });
 
-    const turn = donor
-      ? await this.repoTurns.save({
-          fecha: params.date,
-          donador: donor,
-        })
-      : null;
+    const saveTurn = async (donor: Donador) =>
+      await this.repoTurns.save({
+        fecha: params.date,
+        donador: donor,
+      });
+
+    const turn = donor ? await saveTurn(donor) : null;
 
     const result: ResultReserve = {
       reserved: turn ? true : false,
@@ -118,68 +130,57 @@ export class RepoTurnos {
     return result;
   }
 
+  /* Regresa todos los turnos que fueron reservados en una fecha determianda */
   async getBooked(params: { date: Date }) {
-    const { date } = params;
+    await this.initialize();
+    const date = params.date.toISOString().slice(0, 10);
+
     const turns = await this.repoTurns
       .createQueryBuilder("turn")
-      .where("year(turn.fecha) = :year", {
-        year: date.getFullYear(),
-      })
-      .andWhere("month(turn.fecha) = :month", {
-        month: date.getMonth() + 1,
-      })
-      .andWhere("day(turn.fecha) = :day", {
-        day: date.getDate(),
+      .where("date(turn.fecha) = :date", {
+        date,
       })
       .getMany();
     return turns;
   }
 
-  async getAvailable(params: { date: Date }) {
-    const DURATION_SESSION_IN_HOURS = 2;
-    const NUMBER_OF_DONORS_BY_SESSION = 3;
-    const SCHEDULE_FIRST_SESSION = 8;
-    const SCHEDULE_LAST_SESSION = 17;
-    const NUMBER_OF_SESSIONS = Math.floor(
-      (SCHEDULE_LAST_SESSION - SCHEDULE_FIRST_SESSION) /
-        DURATION_SESSION_IN_HOURS
-    );
-
-    const turns = new Array<{
-      schedule: number;
-      bucket: number;
-    }>(NUMBER_OF_SESSIONS);
-
-    turns.fill({
-      schedule: SCHEDULE_FIRST_SESSION,
-      bucket: NUMBER_OF_DONORS_BY_SESSION,
-    });
+  /* Regresa todos los turnos que posibles en una fecha determianda */
+  private getPossible(params: { date: Date }) {
+    const turns = Array<Turno>(NUMBER_OF_SESSIONS)
+      .fill(new Turno())
+      .map(() => new Turno());
 
     turns.forEach((turn, index) => {
-      turn.schedule += index * DURATION_SESSION_IN_HOURS;
+      turn.fecha = new Date(params.date);
+      turn.fecha.setHours(
+        SCHEDULE_FIRST_SESSION + index * DURATION_SESSION_IN_HOURS
+      );
     });
 
-    const turnsBooked = (await this.getBooked({ date: params.date })).map(
-      (turn) => {
-        const hour = turn.fecha.getHours();
-        return { schedule: hour };
-      }
-    );
+    return turns;
+  }
 
-    turnsBooked.forEach((turn) => {
-      const getBucket = (n: number) =>
-        Math.floor((n - SCHEDULE_FIRST_SESSION) / DURATION_SESSION_IN_HOURS);
-      turns[getBucket(turn.schedule)].bucket -= 1;
+  /* Regresa todos los turnos que libres en una fecha determianda */
+  async getAvailable(params: { date: Date }) {
+    await this.initialize();
+    const turnsPossible = this.getPossible(params);
+    const turnsBooked = await this.getBooked(params);
+    const bucketByTurn = turnsPossible.map((turn) => ({
+      turn,
+      bucket: NUMBER_OF_DONORS_BY_SESSION,
+    }));
+
+    turnsBooked.forEach(({ fecha }) => {
+      const bucket = Math.floor(
+        (fecha.getHours() - SCHEDULE_FIRST_SESSION) / DURATION_SESSION_IN_HOURS
+      );
+      bucketByTurn[bucket].bucket -= 1;
     });
 
-    const possibleShifts = turns.filter((turn) => turn.bucket > 0);
-    const turnsAvailable = possibleShifts.map((turn) => {
-      const date = new Date(params.date);
-      date.setHours(turn.schedule);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      return date;
-    });
+    const turnsAvailable = bucketByTurn
+      .filter(({ bucket }) => bucket > 0)
+      .map(({ turn }) => turn.fecha);
+
     return turnsAvailable;
   }
 }

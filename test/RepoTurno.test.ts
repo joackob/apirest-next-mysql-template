@@ -4,7 +4,7 @@ import { RepoDonadores } from "../lib/RepoDonadores";
 describe("Testing CRUD operations in RepoDonadores", () => {
   const repoTurns = new RepoTurnos();
   const repoDonors = new RepoDonadores();
-  const today = new Date();
+  const today = new Date("8/10/2022 09:00:00");
   const dataToTest: {
     idTurn?: string;
     fecha: Date;
