@@ -1,14 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { repoDonadores } from "@/lib/RepoDonadores";
-import { ResultSave } from "@/lib/types/TypesResult";
+import { repoTurnos, ResultReserve } from "@/lib/RepoTurnos";
 
-interface DonorApiRequest extends NextApiRequest {
+interface TurnApiRequest extends NextApiRequest {
   body: {
     nombre: string;
     apellido: string;
     dni: string;
     email: string;
     telefono: string;
+    fecha: string;
   };
 }
 
@@ -22,7 +22,7 @@ export default async function handler(
   try {
     switch (method) {
       case "POST":
-        await createAdmin(req, res);
+        await createTurn(req, res);
         break;
 
       default:
@@ -35,13 +35,17 @@ export default async function handler(
   }
 }
 
-const createAdmin = async (
-  req: DonorApiRequest,
-  res: NextApiResponse<ResultSave>
+const createTurn = async (
+  req: TurnApiRequest,
+  res: NextApiResponse<ResultReserve>
 ) => {
-  const donor = await repoDonadores.save(req.body);
+  const booking = await repoTurnos.reserve({
+    ...req.body,
+    fecha: new Date(req.body.fecha),
+  });
+
   res
-    .status(201)
-    .setHeader("Location", `/administrador/${donor.id}`)
-    .json(donor);
+    .status(booking.reserved ? 201 : 400)
+    .setHeader("Location", `/turno/${booking.turnID}`)
+    .json(booking);
 };

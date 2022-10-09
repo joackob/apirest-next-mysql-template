@@ -1,9 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
+import { ResultSave } from "@/lib/types/TypesResult";
 
-type PostDataResponse = {
-  id: string;
-};
+interface AdminApiRequest extends NextApiRequest {
+  body: {
+    nombre: string;
+    apellido: string;
+    email: string;
+  };
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,13 +34,12 @@ export default async function handler(
 }
 
 const createAdmin = async (
-  req: NextApiRequest,
-  res: NextApiResponse<PostDataResponse>
+  req: AdminApiRequest,
+  res: NextApiResponse<ResultSave>
 ) => {
-  const { nombre, apellido, email } = req.body;
-  const admin = await repoAdmins.save({ nombre, apellido, email });
+  const admin = await repoAdmins.save(req.body);
   res
     .status(201)
     .setHeader("Location", `/administrador/${admin.id}`)
-    .json({ id: admin.id });
+    .json(admin);
 };

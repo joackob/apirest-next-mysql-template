@@ -1,6 +1,7 @@
 import { DataSource, Repository } from "typeorm";
 import { Turno } from "./entity/Turno";
 import { Donador } from "./entity/Donador";
+import { ResultDelete, ResultUpdate } from "./types/TypesResult";
 
 const DURATION_SESSION_IN_HOURS = 2;
 const SCHEDULE_FIRST_SESSION = 8;
@@ -10,7 +11,7 @@ const NUMBER_OF_SESSIONS = Math.floor(
   (SCHEDULE_LAST_SESSION - SCHEDULE_FIRST_SESSION) / DURATION_SESSION_IN_HOURS
 );
 
-type ResultReserve = {
+export type ResultReserve = {
   reserved: boolean;
   donorID?: string;
   turnID?: string;
@@ -135,13 +136,15 @@ export class RepoTurnos {
     await this.initialize();
     const date = params.date.toISOString().slice(0, 10);
 
-    const turns = await this.repoTurns
+    const turnsBooked = await this.repoTurns
       .createQueryBuilder("turn")
+      .leftJoinAndSelect("turn.donador", "donador")
       .where("date(turn.fecha) = :date", {
         date,
       })
       .getMany();
-    return turns;
+
+    return turnsBooked;
   }
 
   /* Regresa todos los turnos que posibles en una fecha determianda */
@@ -163,8 +166,16 @@ export class RepoTurnos {
   /* Regresa todos los turnos que libres en una fecha determianda */
   async getAvailable(params: { date: Date }) {
     await this.initialize();
+    const date = params.date.toISOString().slice(0, 10);
     const turnsPossible = this.getPossible(params);
-    const turnsBooked = await this.getBooked(params);
+
+    const turnsBooked = await this.repoTurns
+      .createQueryBuilder("turn")
+      .where("date(turn.fecha) = :date", {
+        date,
+      })
+      .getMany();
+
     const bucketByTurn = turnsPossible.map((turn) => ({
       turn,
       bucket: NUMBER_OF_DONORS_BY_SESSION,
@@ -179,9 +190,47 @@ export class RepoTurnos {
 
     const turnsAvailable = bucketByTurn
       .filter(({ bucket }) => bucket > 0)
-      .map(({ turn }) => turn.fecha);
+      .map(({ turn }) => turn);
 
     return turnsAvailable;
+  }
+
+  async findByID(params: { id: string }) {
+    await this.initialize();
+    const { id } = params;
+    const turn = await this.repoTurns
+      .createQueryBuilder("turn")
+      .leftJoinAndSelect("turn.donador", "donador")
+      .where("turn.id = :id", { id })
+      .getOne();
+
+    return turn;
+  }
+
+  async deleteByID(params: { id: string }) {
+    await this.initialize();
+    const res = await this.repoTurns.delete({
+      id: params.id,
+    });
+
+    const affected: ResultDelete = {
+      removed: res.affected === 1,
+    };
+
+    return affected;
+  }
+
+  async updateByID(params: { id: string; date: Date }) {
+    await this.initialize();
+    const res = await this.repoTurns.update(
+      { id: params.id },
+      { fecha: params.date }
+    );
+    const affected: ResultUpdate = {
+      updated: res.affected === 1,
+    };
+
+    return affected;
   }
 }
 

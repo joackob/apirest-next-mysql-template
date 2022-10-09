@@ -6,9 +6,9 @@ describe("Testing CRUD operations in RepoDonadores", () => {
   const repoDonors = new RepoDonadores();
   const today = new Date("8/10/2022 09:00:00");
   const dataToTest: {
-    idTurn?: string;
+    turnID?: string;
     fecha: Date;
-    idDono?: string;
+    donorID?: string;
     nombre: string;
     apellido: string;
     dni: string;
@@ -32,8 +32,8 @@ describe("Testing CRUD operations in RepoDonadores", () => {
       telefono: dataToTest.telefono,
       fecha: dataToTest.fecha,
     });
-    dataToTest.idTurn = result.turnID;
-    dataToTest.idDono = result.donorID;
+    dataToTest.turnID = result.turnID;
+    dataToTest.donorID = result.donorID;
   });
 
   afterAll(async () => {
@@ -42,7 +42,7 @@ describe("Testing CRUD operations in RepoDonadores", () => {
   });
 
   test("Deberia existir un donador asociado a un turno", async () => {
-    const donor = await repoDonors.findByID({ id: dataToTest.idDono ?? "" });
+    const donor = await repoDonors.findByID({ id: dataToTest.donorID ?? "" });
     expect(donor?.nombre).toEqual("Jorge");
   });
 
@@ -54,5 +54,23 @@ describe("Testing CRUD operations in RepoDonadores", () => {
   test("Deberian existir mas de un turno disponible para hoy ", async () => {
     const turns = await repoTurns.getAvailable({ date: today });
     expect(turns?.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test("Deberia poder encontrar un turno por su id", async () => {
+    const turn = await repoTurns.findByID({ id: dataToTest.turnID ?? "" });
+    expect(turn?.donador.id).toEqual(dataToTest.donorID);
+  });
+
+  test("Deberia eliminarse un turno segun su id", async () => {
+    const res = await repoTurns.deleteByID({ id: dataToTest.turnID ?? "" });
+    expect(res.removed).toBeTruthy();
+  });
+
+  test("Deberia actualizar el nombre segun su id", async () => {
+    const res = await repoTurns.updateByID({
+      id: dataToTest.turnID ?? "",
+      date: new Date(),
+    });
+    expect(res.updated).toBeTruthy();
   });
 });

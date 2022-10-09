@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { repoDonadores } from "@/lib/RepoDonadores";
-import { Donador } from "@/lib/entity/Donador";
+import { repoTurnos } from "@/lib/RepoTurnos";
+import { Turno } from "@/lib/entity/Turno";
 
-type GetDonorResponse = {
-  donor: Donador | null;
+type GetTurnResponse = {
+  turn: Turno | null;
 };
 
 export default async function handler(
@@ -16,13 +16,13 @@ export default async function handler(
   try {
     switch (method) {
       case "DELETE":
-        await deleteAdmin(req, res);
+        await deleteTurn(req, res);
         break;
       case "PUT":
-        await updateAdmin(req, res);
+        await updateTurn(req, res);
         break;
       case "GET":
-        await getAdmin(req, res);
+        await getTurn(req, res);
         break;
       default:
         res.status(405).json({});
@@ -34,24 +34,24 @@ export default async function handler(
   }
 }
 
-const deleteAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
+const deleteTurn = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id?.toString() ?? "";
-  const resultDelete = await repoDonadores.deleteByID({ id });
+  const resultDelete = await repoTurnos.deleteByID({ id });
   res.status(resultDelete.removed ? 204 : 404).json({});
 };
 
-const updateAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
+const updateTurn = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id?.toString() ?? "";
-  const resultUpdate = await repoDonadores.updateByID({ id, ...req.body });
+  const resultUpdate = await repoTurnos.updateByID({ id, ...req.body });
   res.status(resultUpdate.updated ? 204 : 404).json({});
 };
 
-const getAdmin = async (
+const getTurn = async (
   req: NextApiRequest,
-  res: NextApiResponse<GetDonorResponse>
+  res: NextApiResponse<GetTurnResponse>
 ) => {
   const id = req.query.id?.toString() ?? "";
-  const donor = await repoDonadores.findByID({ id });
-  const statusCode = donor ? 200 : 404;
-  res.status(statusCode).json({ donor });
+  const turn = await repoTurnos.findByID({ id });
+  const statusCode = turn ? 200 : 404;
+  res.status(statusCode).json({ turn });
 };

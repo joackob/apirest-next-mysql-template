@@ -1,13 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
+import { Administrador } from "@/lib/entity/Administrador";
 
-type GetDataResponse = {
-  admins: {
-    id: string;
-    nombre: string;
-    apellido: string;
-    email: string;
-  }[];
+type GetAdminsResponse = {
+  admins: Administrador[];
 };
 
 export default async function handler(
@@ -33,7 +29,7 @@ export default async function handler(
 }
 const getAdmins = async (
   req: NextApiRequest,
-  res: NextApiResponse<GetDataResponse>
+  res: NextApiResponse<GetAdminsResponse>
 ) => {
   const admins = await repoAdmins.findAll();
   res.status(200).json({

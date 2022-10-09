@@ -1,17 +1,6 @@
 import { DataSource, Repository } from "typeorm";
 import { Donador } from "./entity/Donador";
-
-type ResultUpdate = {
-  updated: boolean;
-};
-
-type ResultDelete = {
-  removed: boolean;
-};
-
-type ResultSave = {
-  id: string;
-};
+import { ResultDelete, ResultSave, ResultUpdate } from "./types/TypesResult";
 
 export class RepoDonadores {
   private repo: Repository<Donador>;
@@ -88,9 +77,10 @@ export class RepoDonadores {
 
   async findByID(params: { id: string }) {
     await this.initialize();
+    const { id } = params;
     const donor = await this.repo.findOne({
       where: {
-        id: params.id,
+        id,
       },
     });
 

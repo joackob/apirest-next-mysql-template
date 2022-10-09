@@ -1,17 +1,6 @@
 import { DataSource, Repository } from "typeorm";
 import { Administrador } from "./entity/Administrador";
-
-type ResultUpdate = {
-  updated: boolean;
-};
-
-type ResultDelete = {
-  removed: boolean;
-};
-
-type ResultSave = {
-  id: string;
-};
+import { ResultDelete, ResultSave, ResultUpdate } from "./types/TypesResult";
 
 export class RepoAdmins {
   private repo: Repository<Administrador>;
@@ -51,13 +40,15 @@ export class RepoAdmins {
 
   async save(params: { nombre: string; apellido: string; email: string }) {
     await this.initialize();
+    const { email } = params;
     const resultSearch = await this.repo
       .createQueryBuilder("admin")
-      .where("admin.email = :email", { email: params.email })
+      .where("admin.email = :email", { email })
       .getOne();
     const admin = resultSearch ?? (await this.repo.save(params));
+    const { id } = admin;
     const result: ResultSave = {
-      id: admin.id,
+      id,
     };
     return result;
   }
