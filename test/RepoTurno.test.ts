@@ -61,16 +61,16 @@ describe("Testing CRUD operations in RepoDonadores", () => {
     expect(turn?.donador.id).toEqual(dataToTest.donorID);
   });
 
-  test("Deberia eliminarse un turno segun su id", async () => {
-    const res = await repoTurns.deleteByID({ id: dataToTest.turnID ?? "" });
-    expect(res.removed).toBeTruthy();
-  });
-
   test("Deberia actualizar el nombre segun su id", async () => {
     const res = await repoTurns.updateByID({
       id: dataToTest.turnID ?? "",
       date: new Date(),
     });
     expect(res.updated).toBeTruthy();
+  });
+
+  test("Deberia eliminarse un turno segun su id", async () => {
+    const res = await repoTurns.deleteByID({ id: dataToTest.turnID ?? "" });
+    expect(res.removed).toBeTruthy();
   });
 });

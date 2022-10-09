@@ -2,6 +2,7 @@ import { DataSource, Repository } from "typeorm";
 import { Turno } from "./entity/Turno";
 import { Donador } from "./entity/Donador";
 import { ResultDelete, ResultUpdate } from "./types/TypesResult";
+import { RepoDonadores } from "./RepoDonadores";
 
 const DURATION_SESSION_IN_HOURS = 2;
 const SCHEDULE_FIRST_SESSION = 8;
@@ -19,7 +20,7 @@ export type ResultReserve = {
 
 export class RepoTurnos {
   private repoTurns: Repository<Turno>;
-  private repoDonors: Repository<Donador>;
+  private repoDonors: RepoDonadores;
   private dataSource: DataSource;
 
   constructor() {
@@ -38,7 +39,7 @@ export class RepoTurnos {
     });
 
     this.repoTurns = this.dataSource.getRepository(Turno);
-    this.repoDonors = this.dataSource.getRepository(Donador);
+    this.repoDonors = new RepoDonadores();
   }
 
   async initialize() {
@@ -51,6 +52,7 @@ export class RepoTurnos {
 
   async destroy() {
     await this.initialize();
+    await this.repoDonors.destroy();
     await this.dataSource.destroy();
     return this;
   }
@@ -72,34 +74,37 @@ export class RepoTurnos {
   }) {
     await this.initialize();
 
-    const { email, dni } = params;
+    const { fecha, ...donorData } = params;
 
-    const donorFound = await this.repoDonors.findOne({
-      where: [{ email }, { dni }],
-    });
+    const res = await this.repoDonors.save(donorData);
+    const donor = await this.repoDonors.findByID({ id: res.id });
+    const date = fecha.toISOString().slice(0, 10);
+    const turnFound = await this.repoTurns
+      .createQueryBuilder("turn")
+      .leftJoinAndSelect("turn.donador", "donador")
+      .where("date(turn.fecha) = :date", { date })
+      .andWhere("turn.donador.id = :id", { id: donor?.id })
+      .getOne();
 
-    const { nombre, apellido, telefono } = params;
+    const updateTurn = async (id: string) => {
+      await this.updateByID({ id, date: fecha });
+      return id;
+    };
 
-    const saveDonor = async () =>
-      await this.repoDonors.save({
-        nombre,
-        apellido,
-        dni,
-        email,
-        telefono,
+    const saveTurn = async (donor: Donador) => {
+      const turn = await this.repoTurns.save({
+        fecha: params.fecha,
+        donador: donor,
       });
-
-    const donor = donorFound ?? (await saveDonor());
-
-    const turn = await this.repoTurns.save({
-      fecha: params.fecha,
-      donador: donor,
-    });
+      return turn.id;
+    };
 
     const result: ResultReserve = {
-      reserved: turn && donor ? true : false,
       donorID: donor?.id,
-      turnID: turn?.id,
+      turnID: turnFound
+        ? await updateTurn(turnFound.id)
+        : await saveTurn(donor!),
+      reserved: true,
     };
 
     return result;
@@ -108,11 +113,8 @@ export class RepoTurnos {
   /* Reserva un turno asociado a un donador segun su id */
   async reserveByDonorID(params: { donorId: string; date: string }) {
     await this.initialize();
-    const donor = await this.repoDonors.findOne({
-      where: {
-        id: params.donorId,
-      },
-    });
+    const id = params.donorId;
+    const donor = await this.repoDonors.findByID({ id });
 
     const saveTurn = async (donor: Donador) =>
       await this.repoTurns.save({
@@ -209,9 +211,12 @@ export class RepoTurnos {
 
   async deleteByID(params: { id: string }) {
     await this.initialize();
-    const res = await this.repoTurns.delete({
-      id: params.id,
-    });
+    const { id } = params;
+    const res = await this.repoTurns
+      .createQueryBuilder()
+      .delete()
+      .where("id = :id", { id })
+      .execute();
 
     const affected: ResultDelete = {
       removed: res.affected === 1,
@@ -222,10 +227,14 @@ export class RepoTurnos {
 
   async updateByID(params: { id: string; date: Date }) {
     await this.initialize();
-    const res = await this.repoTurns.update(
-      { id: params.id },
-      { fecha: params.date }
-    );
+    const { id, date } = params;
+    const res = await this.repoTurns
+      .createQueryBuilder()
+      .update()
+      .set({ fecha: date })
+      .where("id = :id", { id })
+      .execute();
+
     const affected: ResultUpdate = {
       updated: res.affected === 1,
     };

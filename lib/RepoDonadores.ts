@@ -40,14 +40,25 @@ export class RepoDonadores {
     telefono: string;
   }) {
     await this.initialize();
-    const resultSearch = await this.repo
+    const { email, dni } = params;
+    const donorFound = await this.repo
       .createQueryBuilder("donor")
-      .where("donor.email = :email", { email: params.email })
-      .orWhere("donor.dni = :dni", { dni: params.dni })
+      .where("donor.email = :email", { email })
+      .orWhere("donor.dni = :dni", { dni })
       .getOne();
-    const donor = resultSearch ?? (await this.repo.save(params));
+
+    const updateDonor = async (id: string) => {
+      await this.updateByID({ id, ...params });
+      return id;
+    };
+
+    const saveDonor = async () => {
+      const donor = await this.repo.save(params);
+      return donor.id;
+    };
+
     const result: ResultSave = {
-      id: donor.id,
+      id: donorFound ? await updateDonor(donorFound.id) : await saveDonor(),
     };
     return result;
   }
@@ -67,7 +78,13 @@ export class RepoDonadores {
     telefono?: string;
   }) {
     await this.initialize();
-    const res = await this.repo.update({ id: params.id }, params);
+    const { id, ...data } = params;
+    const res = await this.repo
+      .createQueryBuilder()
+      .update()
+      .set(data)
+      .where("id = :id", { id })
+      .execute();
     const affected: ResultUpdate = {
       updated: res.affected === 1,
     };
