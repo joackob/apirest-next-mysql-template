@@ -110,7 +110,7 @@ export class RepoTurnos {
 
   /* Regresa todos los turnos que posibles en una fecha determianda */
   private getPossible(params: { date: Date }) {
-    const turns = Array<Turno>(NUMBER_OF_SESSIONS)
+    const turns = new Array<Turno>(NUMBER_OF_SESSIONS)
       .fill(new Turno())
       .map((_, index) => {
         const turn = new Turno();
