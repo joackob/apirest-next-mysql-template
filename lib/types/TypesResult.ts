@@ -1,9 +1,9 @@
 export type ResultUpdate = {
-  updated: boolean;
+  wasUpdated: boolean;
 };
 
 export type ResultDelete = {
-  removed: boolean;
+  wasRemoved: boolean;
 };
 
 export type ResultSave = {

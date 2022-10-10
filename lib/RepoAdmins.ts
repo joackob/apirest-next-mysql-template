@@ -38,19 +38,22 @@ export class RepoAdmins {
     return this;
   }
 
-  async save(params: { nombre: string; apellido: string; email: string }) {
-    await this.initialize();
-    const { email } = params;
-    const resultSearch = await this.repo
+  private async findByEmail(email: string) {
+    return await this.repo
       .createQueryBuilder("admin")
       .where("admin.email = :email", { email })
       .getOne();
-    const admin = resultSearch ?? (await this.repo.save(params));
-    const { id } = admin;
-    const result: ResultSave = {
-      id,
-    };
-    return result;
+  }
+
+  async save(params: {
+    nombre: string;
+    apellido: string;
+    email: string;
+  }): Promise<Administrador> {
+    await this.initialize();
+    const { email } = params;
+    const adminFound = await this.findByEmail(email);
+    return adminFound ?? (await this.repo.save(params));
   }
 
   async updateByID(params: {
@@ -58,43 +61,36 @@ export class RepoAdmins {
     nombre?: string;
     apellido?: string;
     email?: string;
-  }) {
+  }): Promise<ResultUpdate> {
     await this.initialize();
-    const res = await this.repo.update({ id: params.id }, params);
-    const affected: ResultUpdate = {
-      updated: res.affected === 1,
+    const { id } = params;
+    const { affected } = await this.repo.update({ id }, params);
+    return {
+      wasUpdated: affected === 1,
     };
-
-    return affected;
   }
 
   async findByID(params: { id: string }) {
     await this.initialize();
-    const admin = await this.repo.findOne({
-      where: {
-        id: params.id,
-      },
-    });
-
-    return admin;
+    const { id } = params;
+    return await this.repo
+      .createQueryBuilder("admin")
+      .where("admin.id = :id", { id })
+      .getOne();
   }
 
   async findAll() {
     await this.initialize();
-    const admins = await this.repo.find({});
-    return admins;
+    return await this.repo.find({});
   }
 
-  async deleteByID(params: { id: string }) {
+  async deleteByID(params: { id: string }): Promise<ResultDelete> {
     await this.initialize();
-    const res = await this.repo.delete({
-      id: params.id,
-    });
-    const affected: ResultDelete = {
-      removed: res.affected === 1,
+    const { id } = params;
+    const { affected } = await this.repo.delete({ id });
+    return {
+      wasRemoved: affected === 1,
     };
-
-    return affected;
   }
 }
 

@@ -13,7 +13,7 @@ const NUMBER_OF_SESSIONS = Math.floor(
 );
 
 export type ResultReserve = {
-  reserved: boolean;
+  wasReserved: boolean;
   donorID?: string;
   turnID?: string;
 };
@@ -64,6 +64,15 @@ export class RepoTurnos {
     Si el mismo donador ya reservo turno para el dia de la fecha,
     entonces se actualiza el turno, no se crea uno nuevo
   */
+  private async findByDateAndDonorID(date: string, id: string) {
+    return await this.repoTurns
+      .createQueryBuilder("turn")
+      .leftJoinAndSelect("turn.donador", "donador")
+      .where("date(turn.fecha) = :date", { date })
+      .andWhere("turn.donador.id = :id", { id })
+      .getOne();
+  }
+
   async reserve(params: {
     nombre: string;
     apellido: string;
@@ -71,43 +80,21 @@ export class RepoTurnos {
     email: string;
     telefono: string;
     fecha: Date;
-  }) {
+  }): Promise<ResultReserve> {
     await this.initialize();
-
     const { fecha, ...donorData } = params;
-
-    const res = await this.repoDonors.save(donorData);
-    const donor = await this.repoDonors.findByID({ id: res.id });
+    const donor = await this.repoDonors.save(donorData);
     const date = fecha.toISOString().slice(0, 10);
-    const turnFound = await this.repoTurns
-      .createQueryBuilder("turn")
-      .leftJoinAndSelect("turn.donador", "donador")
-      .where("date(turn.fecha) = :date", { date })
-      .andWhere("turn.donador.id = :id", { id: donor?.id })
-      .getOne();
+    const turnFound = await this.findByDateAndDonorID(date, donor.id);
+    const { id } = turnFound
+      ? await this.repoTurns.save({ ...turnFound, fecha, donador: donor })
+      : await this.repoTurns.save({ fecha, donador: donor });
 
-    const updateTurn = async (id: string) => {
-      await this.updateByID({ id, date: fecha });
-      return id;
+    return {
+      turnID: id,
+      donorID: donor.id,
+      wasReserved: true,
     };
-
-    const saveTurn = async (donor: Donador) => {
-      const turn = await this.repoTurns.save({
-        fecha: params.fecha,
-        donador: donor,
-      });
-      return turn.id;
-    };
-
-    const result: ResultReserve = {
-      donorID: donor?.id,
-      turnID: turnFound
-        ? await updateTurn(turnFound.id)
-        : await saveTurn(donor!),
-      reserved: true,
-    };
-
-    return result;
   }
 
   /* Reserva un turno asociado a un donador segun su id */
@@ -125,7 +112,7 @@ export class RepoTurnos {
     const turn = donor ? await saveTurn(donor) : null;
 
     const result: ResultReserve = {
-      reserved: turn ? true : false,
+      wasReserved: turn ? true : false,
       donorID: donor?.id,
       turnID: turn?.id,
     };
@@ -205,41 +192,34 @@ export class RepoTurnos {
       .leftJoinAndSelect("turn.donador", "donador")
       .where("turn.id = :id", { id })
       .getOne();
-
     return turn;
   }
 
-  async deleteByID(params: { id: string }) {
+  async deleteByID(params: { id: string }): Promise<ResultDelete> {
     await this.initialize();
     const { id } = params;
-    const res = await this.repoTurns
+    const { affected } = await this.repoTurns
       .createQueryBuilder()
       .delete()
       .where("id = :id", { id })
       .execute();
-
-    const affected: ResultDelete = {
-      removed: res.affected === 1,
+    return {
+      wasRemoved: affected === 1,
     };
-
-    return affected;
   }
 
-  async updateByID(params: { id: string; date: Date }) {
+  async updateByID(params: { id: string; date: Date }): Promise<ResultUpdate> {
     await this.initialize();
     const { id, date } = params;
-    const res = await this.repoTurns
+    const { affected } = await this.repoTurns
       .createQueryBuilder()
       .update()
       .set({ fecha: date })
       .where("id = :id", { id })
       .execute();
-
-    const affected: ResultUpdate = {
-      updated: res.affected === 1,
+    return {
+      wasUpdated: affected === 1,
     };
-
-    return affected;
   }
 }
 
