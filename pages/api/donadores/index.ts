@@ -32,7 +32,5 @@ const getAdmins = async (
   res: NextApiResponse<GetDonorsResponse>
 ) => {
   const donors = await repoDonadores.findAll();
-  res.status(200).json({
-    donors,
-  });
+  res.status(200).json({ donors });
 };

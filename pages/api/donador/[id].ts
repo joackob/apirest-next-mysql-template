@@ -37,13 +37,13 @@ export default async function handler(
 const deleteAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id?.toString() ?? "";
   const resultDelete = await repoDonadores.deleteByID({ id });
-  res.status(resultDelete.removed ? 204 : 404).json({});
+  res.status(resultDelete.wasRemoved ? 204 : 404).json({});
 };
 
 const updateAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id?.toString() ?? "";
   const resultUpdate = await repoDonadores.updateByID({ id, ...req.body });
-  res.status(resultUpdate.updated ? 204 : 404).json({});
+  res.status(resultUpdate.wasUpdated ? 204 : 404).json({});
 };
 
 const getAdmin = async (

@@ -97,29 +97,6 @@ export class RepoTurnos {
     };
   }
 
-  /* Reserva un turno asociado a un donador segun su id */
-  async reserveByDonorID(params: { donorId: string; date: string }) {
-    await this.initialize();
-    const id = params.donorId;
-    const donor = await this.repoDonors.findByID({ id });
-
-    const saveTurn = async (donor: Donador) =>
-      await this.repoTurns.save({
-        fecha: params.date,
-        donador: donor,
-      });
-
-    const turn = donor ? await saveTurn(donor) : null;
-
-    const result: ResultReserve = {
-      wasReserved: turn ? true : false,
-      donorID: donor?.id,
-      turnID: turn?.id,
-    };
-
-    return result;
-  }
-
   /* Regresa todos los turnos que fueron reservados en una fecha determianda */
   async getBooked(params: { date: Date }) {
     await this.initialize();

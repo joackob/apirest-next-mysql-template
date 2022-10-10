@@ -37,13 +37,13 @@ export default async function handler(
 const deleteTurn = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id?.toString() ?? "";
   const resultDelete = await repoTurnos.deleteByID({ id });
-  res.status(resultDelete.removed ? 204 : 404).json({});
+  res.status(resultDelete.wasRemoved ? 204 : 404).json({});
 };
 
 const updateTurn = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id?.toString() ?? "";
   const resultUpdate = await repoTurnos.updateByID({ id, ...req.body });
-  res.status(resultUpdate.updated ? 204 : 404).json({});
+  res.status(resultUpdate.wasUpdated ? 204 : 404).json({});
 };
 
 const getTurn = async (

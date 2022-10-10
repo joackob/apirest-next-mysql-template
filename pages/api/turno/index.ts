@@ -45,7 +45,7 @@ const createTurn = async (
   });
 
   res
-    .status(booking.reserved ? 201 : 400)
+    .status(booking.wasReserved ? 201 : 400)
     .setHeader("Location", `/turno/${booking.turnID}`)
     .json(booking);
 };
