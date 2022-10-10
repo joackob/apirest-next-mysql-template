@@ -1,4 +1,4 @@
-import { DataSource, Repository } from "typeorm";
+import { Brackets, DataSource, Repository } from "typeorm";
 import { Turno } from "./entity/Turno";
 import { Donador } from "./entity/Donador";
 import { ResultDelete, ResultUpdate } from "./types/TypesResult";
@@ -112,34 +112,47 @@ export class RepoTurnos {
   private getPossible(params: { date: Date }) {
     const turns = Array<Turno>(NUMBER_OF_SESSIONS)
       .fill(new Turno())
-      .map(() => new Turno());
-    turns.forEach((turn, index) => {
-      turn.fecha = new Date(params.date);
-      turn.fecha.setHours(
-        SCHEDULE_FIRST_SESSION + index * DURATION_SESSION_IN_HOURS
-      );
-    });
-    return turns.map((turn) => ({
-      turn,
-      bucket: NUMBER_OF_DONORS_BY_SESSION,
-    }));
+      .map((_, index) => {
+        const turn = new Turno();
+        turn.fecha = new Date(params.date);
+        turn.fecha.setHours(
+          SCHEDULE_FIRST_SESSION + index * DURATION_SESSION_IN_HOURS
+        );
+        return turn;
+      });
+    return turns;
   }
 
   /* Regresa todos los turnos que libres en una fecha determianda */
+  private groupTurnsByHour(turns: Turno[]) {
+    const numberShiftsHour = new Map<number, number>();
+    turns.forEach(({ fecha }) => {
+      const hours = fecha.getHours();
+      const count = numberShiftsHour.get(hours) ?? 0;
+      numberShiftsHour.set(hours, count + 1);
+    });
+    return numberShiftsHour;
+  }
+
   async getAvailable(params: { date: Date }) {
     await this.initialize();
     const turnsPossible = this.getPossible(params);
     const turnsBooked = await this.getBooked(params);
-    turnsBooked.forEach(({ fecha }) => {
-      const index = Math.floor(
-        (fecha.getHours() - SCHEDULE_FIRST_SESSION) / DURATION_SESSION_IN_HOURS
-      );
-      turnsPossible[index].bucket -= 1;
+    const numberShiftsHour = this.groupTurnsByHour([
+      ...turnsPossible,
+      ...turnsBooked,
+    ]);
+    const turnAvailable = new Array<Turno>();
+    numberShiftsHour.forEach((count, hour) => {
+      if (count <= NUMBER_OF_DONORS_BY_SESSION) {
+        const turn = new Turno();
+        const date = new Date(params.date);
+        date.setHours(hour, 0, 0);
+        turn.fecha = date;
+        turnAvailable.push(turn);
+      }
     });
-    const turnsAvailable = turnsPossible
-      .filter(({ bucket }) => bucket > 0)
-      .map(({ turn }) => turn);
-    return turnsAvailable;
+    return turnAvailable;
   }
 
   async findByID(params: { id: string }) {
