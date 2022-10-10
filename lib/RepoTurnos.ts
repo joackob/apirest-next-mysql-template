@@ -101,16 +101,11 @@ export class RepoTurnos {
   async getBooked(params: { date: Date }) {
     await this.initialize();
     const date = params.date.toISOString().slice(0, 10);
-
-    const turnsBooked = await this.repoTurns
+    return await this.repoTurns
       .createQueryBuilder("turn")
       .leftJoinAndSelect("turn.donador", "donador")
-      .where("date(turn.fecha) = :date", {
-        date,
-      })
+      .where("date(turn.fecha) = :date", { date })
       .getMany();
-
-    return turnsBooked;
   }
 
   /* Regresa todos los turnos que posibles en una fecha determianda */
@@ -118,46 +113,32 @@ export class RepoTurnos {
     const turns = Array<Turno>(NUMBER_OF_SESSIONS)
       .fill(new Turno())
       .map(() => new Turno());
-
     turns.forEach((turn, index) => {
       turn.fecha = new Date(params.date);
       turn.fecha.setHours(
         SCHEDULE_FIRST_SESSION + index * DURATION_SESSION_IN_HOURS
       );
     });
-
-    return turns;
+    return turns.map((turn) => ({
+      turn,
+      bucket: NUMBER_OF_DONORS_BY_SESSION,
+    }));
   }
 
   /* Regresa todos los turnos que libres en una fecha determianda */
   async getAvailable(params: { date: Date }) {
     await this.initialize();
-    const date = params.date.toISOString().slice(0, 10);
     const turnsPossible = this.getPossible(params);
-
-    const turnsBooked = await this.repoTurns
-      .createQueryBuilder("turn")
-      .where("date(turn.fecha) = :date", {
-        date,
-      })
-      .getMany();
-
-    const bucketByTurn = turnsPossible.map((turn) => ({
-      turn,
-      bucket: NUMBER_OF_DONORS_BY_SESSION,
-    }));
-
+    const turnsBooked = await this.getBooked(params);
     turnsBooked.forEach(({ fecha }) => {
-      const bucket = Math.floor(
+      const index = Math.floor(
         (fecha.getHours() - SCHEDULE_FIRST_SESSION) / DURATION_SESSION_IN_HOURS
       );
-      bucketByTurn[bucket].bucket -= 1;
+      turnsPossible[index].bucket -= 1;
     });
-
-    const turnsAvailable = bucketByTurn
+    const turnsAvailable = turnsPossible
       .filter(({ bucket }) => bucket > 0)
       .map(({ turn }) => turn);
-
     return turnsAvailable;
   }
 
