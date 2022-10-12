@@ -23,7 +23,6 @@ Procurar tener actualizado `node.js` a la versión `lts`. Si desea asegurarse, p
     nvm install --lts
     ```
 
-
 ## Instalación y ejecución
 
 - 🛠Para instalar las dependencias ejecutar el siguiente comando `npm install`
@@ -123,3 +122,10 @@ Por último, un detalle. Por el momento, existe un [error](https://github.com/uu
 ```
 
 En este mismo template existe un ejemplo sobre una forma de trabajar con [TypeORM](https://typeorm.io/). Se trata de un sistema para gestionar turnos de hospitales. 
+
+## Recursos y opciones que ofrece la API de Ejemplo
+
+Seccion a completar
+
+
+
