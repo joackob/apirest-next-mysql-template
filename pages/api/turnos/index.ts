@@ -18,6 +18,10 @@ export default async function handler(
   const { method } = req;
   try {
     switch (method) {
+      case "OPTIONS":
+        res.setHeader("Allow", "HEAD, GET ");
+        res.status(200).end();
+        break;
       case "HEAD":
         res.status(200).end();
         break;

@@ -21,6 +21,10 @@ export default async function handler(
 
   try {
     switch (method) {
+      case "OPTIONS":
+        res.setHeader("Allow", "HEAD, GET, POST, PUT, DELETE");
+        res.status(200).end();
+        break;
       case "HEAD":
         res.status(200).end();
         break;

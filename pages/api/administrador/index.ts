@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
 import { ResultSave } from "@/lib/types/TypesResult";
+import Head from "next/head";
 
 interface AdminApiRequest extends NextApiRequest {
   body: {
@@ -19,6 +20,10 @@ export default async function handler(
 
   try {
     switch (method) {
+      case "OPTIONS":
+        res.setHeader("Allow", "HEAD, GET, POST, PUT, DELETE");
+        res.status(200).end();
+        break;
       case "HEAD":
         res.status(200).end();
         break;
