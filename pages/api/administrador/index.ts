@@ -40,6 +40,6 @@ const createAdmin = async (
   const admin = await repoAdmins.save(req.body);
   res
     .status(201)
-    .setHeader("Location", `/administrador/${admin.id}`)
+    .setHeader("Location", `${process.env.APIURL}/administrador/${admin.id}`)
     .json(admin);
 };

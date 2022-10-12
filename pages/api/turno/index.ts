@@ -46,6 +46,6 @@ const createTurn = async (
 
   res
     .status(booking.wasReserved ? 201 : 400)
-    .setHeader("Location", `/turno/${booking.turnID}`)
+    .setHeader("Location", `${process.env.APIURL}/turno/${booking.turnID}`)
     .json(booking);
 };
