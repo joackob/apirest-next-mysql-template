@@ -1,4 +1,4 @@
-# API Rest with NextJS, TypeORM  and MySQL:writing_hand:
+# API Rest with NextJS, TypeORM and MySQL:writing_hand:
 
 Este template fue creado para aprender sobre tecnologías backend. Posee un ejemplo y en este archivo se explicara el paso a paso de como fue su proceso de desarrollo.
 
@@ -13,7 +13,7 @@ Procurar tener actualizado `node.js` a la versión `lts`. Si desea asegurarse, p
 
 - En windows, desde la [pagina oficial](https://nodejs.org/en/), descargando y ejecutando la versión `lts`.
 
-- En Linux, a través de [nvm](https://github.com/nvm-sh/nvm) 
+- En Linux, a través de [nvm](https://github.com/nvm-sh/nvm)
 
   - Abrir una terminal y ejecutar el comando que se encuentra en la sección [Install & update script](https://github.com/nvm-sh/nvm#install--update-script)
 
@@ -38,6 +38,7 @@ Procurar tener actualizado `node.js` a la versión `lts`. Si desea asegurarse, p
 - `DBPORT`: Puerto para acceder a la base de datos, por defecto es “3306”
 - `DBPASS`: Password o contraseña asociado al usuarios para acceder a la base de datos, por defecto es “password”
 - `DB`: Nombre de la base de datos, por defecto es “test”. Recordar que esta base de datos debe ser creada antes de ejecutar la aplicación o los tests
+- `APIURL`: Url de la api, por defecto es "http://localhost:3000/api"
 
 Se puede usar el archivo `.env` para configurar estas variables de entorno en testing y desarrollo. Solo se debe ejecutar el comando `cp .env.example .env`.
 
@@ -49,7 +50,7 @@ Se puede usar el archivo `.env` para configurar estas variables de entorno en te
 - [TypeOrm](https://typeorm.io/)
 - [Reflect-metadata](https://www.npmjs.com/package/reflect-metadata)
 
-## Artículos y ejemplos  tomados en cuenta para el desarrollo del template
+## Artículos y ejemplos tomados en cuenta para el desarrollo del template
 
 - [Dependency Injection with NextJS and TypeScript](https://himynameistim.com/blog/dependency-injection-with-nextjs-and-typescript)
 - [Testing in NextJS](https://nextjs.org/docs/testing)
@@ -57,7 +58,7 @@ Se puede usar el archivo `.env` para configurar estas variables de entorno en te
 
 ## Pasos para crear este template
 
-Para aligerar la carga del trabajo, recomiendo usar el ejemplo que `NextJS` provee en su sitio oficial. Mediante el siguiente comando. 
+Para aligerar la carga del trabajo, recomiendo usar el ejemplo que `NextJS` provee en su sitio oficial. Mediante el siguiente comando.
 
 ```bash
 npx create-next-app --example with-jest with-jest-app
@@ -75,10 +76,10 @@ Agregamos las siguientes opciones al archivo `tsconfig.json`
 
 ```json
 {
-    "compilerOptions": {
-      "experimentalDecorators": true,
-      "emitDecoratorMetadata": true
-    }
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
 }
 ```
 
@@ -92,12 +93,12 @@ Configuramos el archivo `.babelrc`. `NextJS` permite extender las funcionalidade
 
 ```json
 {
-    "presets": ["next/babel"],
-    "plugins": [
-      "babel-plugin-transform-typescript-metadata",
-      ["@babel/plugin-proposal-decorators", { "legacy": true }],
-      ["@babel/plugin-proposal-class-properties", { "loose": true }]
-    ]
+  "presets": ["next/babel"],
+  "plugins": [
+    "babel-plugin-transform-typescript-metadata",
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }]
+  ]
 }
 ```
 
@@ -121,11 +122,8 @@ Por último, un detalle. Por el momento, existe un [error](https://github.com/uu
   },
 ```
 
-En este mismo template existe un ejemplo sobre una forma de trabajar con [TypeORM](https://typeorm.io/). Se trata de un sistema para gestionar turnos de hospitales. 
+En este mismo template existe un ejemplo sobre una forma de trabajar con [TypeORM](https://typeorm.io/). Se trata de un sistema para gestionar turnos de hospitales.
 
 ## Recursos y opciones que ofrece la API de Ejemplo
 
 Seccion a completar
-
-
-
