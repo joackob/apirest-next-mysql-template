@@ -19,10 +19,12 @@ export default async function handler(
 
   try {
     switch (method) {
+      case "HEAD":
+        res.status(200).end();
+        break;
       case "POST":
         await createAdmin(req, res);
         break;
-
       default:
         res.status(405).json({});
         break;

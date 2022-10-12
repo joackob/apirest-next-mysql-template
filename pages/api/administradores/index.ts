@@ -14,10 +14,12 @@ export default async function handler(
   const { method } = req;
   try {
     switch (method) {
+      case "HEAD":
+        res.status(200).end();
+        break;
       case "GET":
         await getAdmins(req, res);
         break;
-
       default:
         res.status(405).json({});
         break;

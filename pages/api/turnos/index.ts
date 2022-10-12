@@ -18,6 +18,9 @@ export default async function handler(
   const { method } = req;
   try {
     switch (method) {
+      case "HEAD":
+        res.status(200).end();
+        break;
       case "GET":
         await getTurns(req, res);
         break;

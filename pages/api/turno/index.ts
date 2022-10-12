@@ -21,10 +21,12 @@ export default async function handler(
 
   try {
     switch (method) {
+      case "HEAD":
+        res.status(200).end();
+        break;
       case "POST":
         await createTurn(req, res);
         break;
-
       default:
         res.status(405).json({});
         break;
