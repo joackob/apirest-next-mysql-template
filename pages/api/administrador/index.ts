@@ -10,6 +10,7 @@ interface AdminApiRequest extends NextApiRequest {
 }
 
 type PostAdminResponse = {
+  id: string;
   url: string;
 };
 
@@ -48,6 +49,7 @@ const createAdmin = async (
 ) => {
   const admin = await repoAdmins.save(req.body);
   const response = {
+    id: admin.id,
     url: `${process.env.APIURL}/administrador/${admin.id}`,
   };
   res.status(201).setHeader("Location", response.url).json(response);

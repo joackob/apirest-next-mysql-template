@@ -12,6 +12,7 @@ interface DonorApiRequest extends NextApiRequest {
 }
 
 type PostDonorResponse = {
+  id: string;
   url: string;
 };
 
@@ -50,6 +51,7 @@ const createAdmin = async (
 ) => {
   const donor = await repoDonadores.save(req.body);
   const response = {
+    id: donor.id,
     url: `${process.env.APIURL}/donador/${donor.id}`,
   };
   res.status(201).setHeader("Location", response.url).json(response);

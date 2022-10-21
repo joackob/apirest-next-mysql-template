@@ -13,6 +13,7 @@ interface TurnApiRequest extends NextApiRequest {
 }
 
 type PostTurnResponse = {
+  id?: string;
   url: string;
 };
 
@@ -55,6 +56,7 @@ const createTurn = async (
   });
 
   const response = {
+    id: booking.turnID,
     url: `${process.env.APIURL}/turno/${booking.turnID}`,
   };
 
