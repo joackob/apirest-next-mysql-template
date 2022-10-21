@@ -1,9 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoTurnos } from "@/lib/RepoTurnos";
-import { Turno } from "@/lib/entity/Turno";
 
 type GetTurnResponse = {
-  turn: Turno | null;
+  id?: string;
+  fecha?: Date;
+  donador?: {
+    url?: string;
+  };
+  url: string;
 };
 
 export default async function handler(
@@ -53,5 +57,13 @@ const getTurn = async (
   const id = req.query.id?.toString() ?? "";
   const turn = await repoTurnos.findByID({ id });
   const statusCode = turn ? 200 : 404;
-  res.status(statusCode).json({ turn });
+  const response = {
+    id: turn?.id,
+    fecha: turn?.fecha,
+    donador: {
+      url: `${process.env.URLAPI}/donador/${turn?.donador.id}`,
+    },
+    url: `${process.env.URLAPI}/turno/${turn?.id}`,
+  };
+  res.status(statusCode).json(response);
 };

@@ -1,10 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
-import { Administrador } from "@/lib/entity/Administrador";
 
 type GetAdminsResponse = {
-  admins: Administrador[];
-};
+  id: string;
+  nombre: string;
+  apellido: string;
+  email: string;
+  url: string;
+}[];
 
 export default async function handler(
   req: NextApiRequest,
@@ -38,7 +41,9 @@ const getAdmins = async (
   res: NextApiResponse<GetAdminsResponse>
 ) => {
   const admins = await repoAdmins.findAll();
-  res.status(200).json({
-    admins,
-  });
+  const response = admins.map((admin) => ({
+    ...admin,
+    url: `${process.env.APIURL}/administrador/${admin.id}`,
+  }));
+  res.status(200).json(response);
 };

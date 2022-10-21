@@ -1,9 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
-import { Administrador } from "@/lib/entity/Administrador";
 
 type GetAdminResponse = {
-  admin: Administrador | null;
+  id?: string;
+  nombre?: string;
+  apellido?: string;
+  email?: string;
+  url: string;
 };
 
 export default async function handler(
@@ -53,5 +56,9 @@ const getAdmin = async (
   const id = req.query.id?.toString() ?? "";
   const admin = await repoAdmins.findByID({ id });
   const statusCode = admin ? 200 : 404;
-  res.status(statusCode).json({ admin });
+  const response = {
+    ...admin,
+    url: `${process.env.APIURL}/administrador/${id}`,
+  };
+  res.status(statusCode).json(response);
 };

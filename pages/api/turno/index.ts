@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { repoTurnos, ResultReserve } from "@/lib/RepoTurnos";
+import { repoTurnos } from "@/lib/RepoTurnos";
 
 interface TurnApiRequest extends NextApiRequest {
   body: {
@@ -11,6 +11,10 @@ interface TurnApiRequest extends NextApiRequest {
     fecha: string;
   };
 }
+
+type PostTurnResponse = {
+  url: string;
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -43,15 +47,19 @@ export default async function handler(
 
 const createTurn = async (
   req: TurnApiRequest,
-  res: NextApiResponse<ResultReserve>
+  res: NextApiResponse<PostTurnResponse>
 ) => {
   const booking = await repoTurnos.reserve({
     ...req.body,
     fecha: new Date(req.body.fecha),
   });
 
+  const response = {
+    url: `${process.env.APIURL}/turno/${booking.turnID}`,
+  };
+
   res
     .status(booking.wasReserved ? 201 : 400)
-    .setHeader("Location", `${process.env.APIURL}/turno/${booking.turnID}`)
-    .json(booking);
+    .setHeader("Location", response.url)
+    .json(response);
 };

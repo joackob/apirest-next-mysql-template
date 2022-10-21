@@ -1,9 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoDonadores } from "@/lib/RepoDonadores";
-import { Donador } from "@/lib/entity/Donador";
 
 type GetDonorResponse = {
-  donor: Donador | null;
+  id?: string;
+  nombre?: string;
+  apellido?: string;
+  dni?: string;
+  email?: string;
+  telefono?: string;
+  url: string;
 };
 
 export default async function handler(
@@ -53,5 +58,9 @@ const getAdmin = async (
   const id = req.query.id?.toString() ?? "";
   const donor = await repoDonadores.findByID({ id });
   const statusCode = donor ? 200 : 404;
-  res.status(statusCode).json({ donor });
+  const response = {
+    ...donor,
+    url: `${process.env.APIURL}/donador/${id}`,
+  };
+  res.status(statusCode).json(response);
 };

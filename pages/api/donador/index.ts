@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoDonadores } from "@/lib/RepoDonadores";
-import { ResultSave } from "@/lib/types/TypesResult";
 
 interface DonorApiRequest extends NextApiRequest {
   body: {
@@ -11,6 +10,10 @@ interface DonorApiRequest extends NextApiRequest {
     telefono: string;
   };
 }
+
+type PostDonorResponse = {
+  url: string;
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -43,11 +46,11 @@ export default async function handler(
 
 const createAdmin = async (
   req: DonorApiRequest,
-  res: NextApiResponse<ResultSave>
+  res: NextApiResponse<PostDonorResponse>
 ) => {
   const donor = await repoDonadores.save(req.body);
-  res
-    .status(201)
-    .setHeader("Location", `${process.env.APIURL}/donador/${donor.id}`)
-    .json(donor);
+  const response = {
+    url: `${process.env.APIURL}/donador/${donor.id}`,
+  };
+  res.status(201).setHeader("Location", response.url).json(response);
 };

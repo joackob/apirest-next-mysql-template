@@ -1,10 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoDonadores } from "@/lib/RepoDonadores";
-import { Donador } from "@/lib/entity/Donador";
 
 type GetDonorsResponse = {
-  donors: Donador[];
-};
+  id: string;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  email: string;
+  telefono: string;
+  url: string;
+}[];
 
 export default async function handler(
   req: NextApiRequest,
@@ -38,5 +43,9 @@ const getAdmins = async (
   res: NextApiResponse<GetDonorsResponse>
 ) => {
   const donors = await repoDonadores.findAll();
-  res.status(200).json({ donors });
+  const response = donors.map((donor) => ({
+    ...donor,
+    url: `${process.env.APIURL}/donador/${donor.id}`,
+  }));
+  res.status(200).json(response);
 };
