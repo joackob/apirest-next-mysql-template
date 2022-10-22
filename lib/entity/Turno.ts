@@ -4,7 +4,7 @@ import { Donador } from "./Donador";
 @Entity()
 export class Turno {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: string;
 
   @Column({ type: "timestamp", nullable: false })
   fecha!: Date;

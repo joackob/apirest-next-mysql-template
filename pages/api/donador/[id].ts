@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { repoDonadores } from "@/lib/RepoDonadores";
 
 type GetDonorResponse = {
-  id?: number;
+  id?: string;
   nombre?: string;
   apellido?: string;
   dni?: string;
@@ -34,19 +34,19 @@ export default async function handler(
         break;
     }
   } catch (error) {
-    console.log(error);
+    console.log(typeof error);
     res.status(400).json({});
   }
 }
 
 const deleteAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = parseInt(req.query.id?.toString() ?? "", 10);
+  const id = req.query.id?.toString() ?? "";
   const resultDelete = await repoDonadores.deleteByID({ id });
   res.status(resultDelete.wasRemoved ? 204 : 404).json({});
 };
 
 const updateAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = parseInt(req.query.id?.toString() ?? "", 10);
+  const id = req.query.id?.toString() ?? "";
   const resultUpdate = await repoDonadores.updateByID({ id, ...req.body });
   res.status(resultUpdate.wasUpdated ? 204 : 404).json({});
 };
@@ -55,7 +55,7 @@ const getAdmin = async (
   req: NextApiRequest,
   res: NextApiResponse<GetDonorResponse>
 ) => {
-  const id = parseInt(req.query.id?.toString() ?? "", 10);
+  const id = req.query.id?.toString() ?? "";
   const donor = await repoDonadores.findByID({ id });
   const statusCode = donor ? 200 : 404;
   const response = {

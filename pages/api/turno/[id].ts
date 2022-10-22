@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { repoTurnos } from "@/lib/RepoTurnos";
 
 type GetTurnResponse = {
-  id?: number;
+  id?: string;
   fecha?: Date;
   donador?: {
     url?: string;
@@ -33,19 +33,19 @@ export default async function handler(
         break;
     }
   } catch (error) {
-    console.log(error);
+    console.log(typeof error);
     res.status(400).json({});
   }
 }
 
 const deleteTurn = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = parseInt(req.query.id?.toString() ?? "", 10);
+  const id = req.query.id?.toString() ?? "";
   const resultDelete = await repoTurnos.deleteByID({ id });
   res.status(resultDelete.wasRemoved ? 204 : 404).json({});
 };
 
 const updateTurn = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = parseInt(req.query.id?.toString() ?? "", 10);
+  const id = req.query.id?.toString() ?? "";
   const resultUpdate = await repoTurnos.updateByID({ id, ...req.body });
   res.status(resultUpdate.wasUpdated ? 204 : 404).json({});
 };
@@ -54,7 +54,7 @@ const getTurn = async (
   req: NextApiRequest,
   res: NextApiResponse<GetTurnResponse>
 ) => {
-  const id = parseInt(req.query.id?.toString() ?? "", 10);
+  const id = req.query.id?.toString() ?? "";
   const turn = await repoTurnos.findByID({ id });
   const statusCode = turn ? 200 : 404;
   const response = {

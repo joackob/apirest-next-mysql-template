@@ -4,7 +4,7 @@ import { repoTurnos } from "@/lib/RepoTurnos";
 type GetTurnsAvailableResponse = Date[];
 
 type GetTurnsBookedResponse = {
-  id: number;
+  id: string;
   fecha: Date;
   donador: {
     url: string;

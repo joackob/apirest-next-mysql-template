@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { repoDonadores } from "@/lib/RepoDonadores";
 
 type GetDonorsResponse = {
-  id: number;
+  id: string;
   nombre: string;
   apellido: string;
   dni: string;
@@ -34,7 +34,7 @@ export default async function handler(
         break;
     }
   } catch (error) {
-    console.log(error);
+    console.log(typeof error);
     res.status(500).json({});
   }
 }

@@ -3,14 +3,14 @@ import { RepoDonadores } from "../lib/RepoDonadores";
 describe("Testing CRUD operations in RepoDonadores", () => {
   const repo = new RepoDonadores();
   const dataToTest: {
-    id: number;
+    id: string;
     nombre: string;
     apellido: string;
     dni: string;
     email: string;
     telefono: string;
   } = {
-    id: 1,
+    id: "1",
     nombre: "Juan",
     apellido: "Suarez",
     dni: "30123456",

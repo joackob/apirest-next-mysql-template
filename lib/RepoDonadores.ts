@@ -62,7 +62,7 @@ export class RepoDonadores {
   }
 
   async updateByID(params: {
-    id: number;
+    id: string;
     nombre?: string;
     apellido?: string;
     dni?: string;
@@ -82,7 +82,7 @@ export class RepoDonadores {
     };
   }
 
-  async findByID(params: { id: number }) {
+  async findByID(params: { id: string }) {
     await this.initialize();
     const { id } = params;
     return await this.repo
@@ -97,7 +97,7 @@ export class RepoDonadores {
     return admins;
   }
 
-  async deleteByID(params: { id: number }): Promise<ResultDelete> {
+  async deleteByID(params: { id: string }): Promise<ResultDelete> {
     await this.initialize();
     const { id } = params;
     const { affected } = await this.repo
