@@ -13,7 +13,7 @@ interface TurnApiRequest extends NextApiRequest {
 }
 
 type PostTurnResponse = {
-  id?: string;
+  id?: number;
   url: string;
 };
 
@@ -41,7 +41,7 @@ export default async function handler(
         break;
     }
   } catch (error) {
-    console.log(typeof error);
+    console.log(error);
     res.status(500).json({});
   }
 }

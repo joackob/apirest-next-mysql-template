@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
 
 type GetAdminsResponse = {
-  id: string;
+  id: number;
   nombre: string;
   apellido: string;
   email: string;
@@ -32,7 +32,7 @@ export default async function handler(
         break;
     }
   } catch (error) {
-    console.log(typeof error);
+    console.log(error);
     res.status(500).json({});
   }
 }
