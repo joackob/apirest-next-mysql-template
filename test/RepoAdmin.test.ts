@@ -3,12 +3,12 @@ import { RepoAdmins } from "../lib/RepoAdmins";
 describe("Testing CRUD operations in repoAdmins", () => {
   const repo = new RepoAdmins();
   const dataToTest: {
-    id: string;
+    id: number;
     nombre: string;
     apellido: string;
     email: string;
   } = {
-    id: "1",
+    id: 1,
     nombre: "Juan",
     apellido: "Suarez",
     email: "jsuarez@etec.uba.ar",

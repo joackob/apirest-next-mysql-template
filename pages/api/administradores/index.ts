@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
 
 type GetAdminsResponse = {
-  id: string;
+  id: number;
   nombre: string;
   apellido: string;
   email: string;

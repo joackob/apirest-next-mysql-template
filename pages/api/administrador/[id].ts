@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
 
 type GetAdminResponse = {
-  id?: string;
+  id?: number;
   nombre?: string;
   apellido?: string;
   email?: string;
@@ -38,13 +38,13 @@ export default async function handler(
 }
 
 const deleteAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = req.query.id?.toString() ?? "";
+  const id = Number(req.query.id);
   const resultDelete = await repoAdmins.deleteByID({ id });
   res.status(resultDelete.wasRemoved ? 204 : 404).json({});
 };
 
 const updateAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = req.query.id?.toString() ?? "";
+  const id = Number(req.query.id);
   const resultUpdate = await repoAdmins.updateByID({ id, ...req.body });
   res.status(resultUpdate.wasUpdated ? 204 : 404).json({});
 };
@@ -53,7 +53,7 @@ const getAdmin = async (
   req: NextApiRequest,
   res: NextApiResponse<GetAdminResponse>
 ) => {
-  const id = req.query.id?.toString() ?? "";
+  const id = Number(req.query.id);
   const admin = await repoAdmins.findByID({ id });
   const statusCode = admin ? 200 : 404;
   const response = {

@@ -14,8 +14,8 @@ const NUMBER_OF_SESSIONS = Math.floor(
 
 export type ResultReserve = {
   wasReserved: boolean;
-  donorID?: string;
-  turnID?: string;
+  donorID?: number;
+  turnID?: number;
 };
 
 export class RepoTurnos {
@@ -64,7 +64,7 @@ export class RepoTurnos {
     Si el mismo donador ya reservo turno para el dia de la fecha,
     entonces se actualiza el turno, no se crea uno nuevo
   */
-  private async findByDateAndDonorID(date: string, id: string) {
+  private async findByDateAndDonorID(date: string, id: number) {
     return await this.repoTurns
       .createQueryBuilder("turn")
       .leftJoinAndSelect("turn.donador", "donador")
@@ -155,7 +155,7 @@ export class RepoTurnos {
     return turnAvailable;
   }
 
-  async findByID(params: { id: string }) {
+  async findByID(params: { id: number }) {
     await this.initialize();
     const { id } = params;
     const turn = await this.repoTurns
@@ -166,7 +166,7 @@ export class RepoTurnos {
     return turn;
   }
 
-  async deleteByID(params: { id: string }): Promise<ResultDelete> {
+  async deleteByID(params: { id: number }): Promise<ResultDelete> {
     await this.initialize();
     const { id } = params;
     const { affected } = await this.repoTurns
@@ -179,7 +179,7 @@ export class RepoTurnos {
     };
   }
 
-  async updateByID(params: { id: string; date: Date }): Promise<ResultUpdate> {
+  async updateByID(params: { id: number; date: Date }): Promise<ResultUpdate> {
     await this.initialize();
     const { id, date } = params;
     const { affected } = await this.repoTurns

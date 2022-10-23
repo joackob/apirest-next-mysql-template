@@ -12,7 +12,7 @@ interface DonorApiRequest extends NextApiRequest {
 }
 
 type PostDonorResponse = {
-  id: string;
+  id: number;
   url: string;
 };
 

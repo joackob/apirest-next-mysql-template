@@ -7,5 +7,5 @@ export type ResultDelete = {
 };
 
 export type ResultSave = {
-  id: string;
+  id: number;
 };

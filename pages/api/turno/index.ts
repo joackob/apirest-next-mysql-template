@@ -13,7 +13,7 @@ interface TurnApiRequest extends NextApiRequest {
 }
 
 type PostTurnResponse = {
-  id?: string;
+  id?: number;
   url: string;
 };
 

@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { repoTurnos } from "@/lib/RepoTurnos";
 
 type GetTurnResponse = {
-  id?: string;
+  id?: number;
   fecha?: Date;
   donador?: {
     url?: string;
@@ -39,13 +39,13 @@ export default async function handler(
 }
 
 const deleteTurn = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = req.query.id?.toString() ?? "";
+  const id = Number(req.query.id);
   const resultDelete = await repoTurnos.deleteByID({ id });
   res.status(resultDelete.wasRemoved ? 204 : 404).json({});
 };
 
 const updateTurn = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = req.query.id?.toString() ?? "";
+  const id = Number(req.query.id);
   const resultUpdate = await repoTurnos.updateByID({ id, ...req.body });
   res.status(resultUpdate.wasUpdated ? 204 : 404).json({});
 };
@@ -54,7 +54,7 @@ const getTurn = async (
   req: NextApiRequest,
   res: NextApiResponse<GetTurnResponse>
 ) => {
-  const id = req.query.id?.toString() ?? "";
+  const id = Number(req.query.id);
   const turn = await repoTurnos.findByID({ id });
   const statusCode = turn ? 200 : 404;
   const response = {

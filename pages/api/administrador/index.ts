@@ -10,7 +10,7 @@ interface AdminApiRequest extends NextApiRequest {
 }
 
 type PostAdminResponse = {
-  id: string;
+  id: number;
   url: string;
 };
 
