@@ -1,14 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoAdmins } from "@/lib/RepoAdmins";
 
-interface AdminApiRequest extends NextApiRequest {
-  body: {
-    nombre: string;
-    apellido: string;
-    email: string;
-  };
-}
-
 type PostAdminResponse = {
   id: number;
   url: string;
@@ -44,7 +36,7 @@ export default async function handler(
 }
 
 const createAdmin = async (
-  req: AdminApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse<PostAdminResponse>
 ) => {
   const admin = await repoAdmins.save(req.body);

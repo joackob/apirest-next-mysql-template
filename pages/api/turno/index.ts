@@ -1,17 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoTurnos } from "@/lib/RepoTurnos";
 
-interface TurnApiRequest extends NextApiRequest {
-  body: {
-    nombre: string;
-    apellido: string;
-    dni: string;
-    email: string;
-    telefono: string;
-    fecha: string;
-  };
-}
-
 type PostTurnResponse = {
   id?: number;
   url: string;
@@ -47,7 +36,7 @@ export default async function handler(
 }
 
 const createTurn = async (
-  req: TurnApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse<PostTurnResponse>
 ) => {
   const booking = await repoTurnos.reserve({

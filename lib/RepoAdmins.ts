@@ -1,6 +1,11 @@
 import { DataSource, Repository } from "typeorm";
 import { Administrador } from "./entity/Administrador";
-import { ResultDelete, ResultSave, ResultUpdate } from "./types/TypesResult";
+import {
+  ResultDelete,
+  ResultDeletes,
+  ResultSave,
+  ResultUpdate,
+} from "./types/TypesResult";
 
 export class RepoAdmins {
   private repo: Repository<Administrador>;
@@ -90,6 +95,20 @@ export class RepoAdmins {
     const { affected } = await this.repo.delete({ id });
     return {
       wasRemoved: affected === 1,
+    };
+  }
+
+  async deleteByIDs(params: { ids: number[] }): Promise<ResultDeletes> {
+    await this.initialize();
+    const { ids } = params;
+    const { affected } = await this.repo
+      .createQueryBuilder()
+      .delete()
+      .where("id in (:...ids)", { ids })
+      .execute();
+
+    return {
+      removed: Number(affected),
     };
   }
 }

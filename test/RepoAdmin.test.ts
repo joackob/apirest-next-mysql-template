@@ -14,7 +14,7 @@ describe("Testing CRUD operations in repoAdmins", () => {
     email: "jsuarez@etec.uba.ar",
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const admin = await repo.save({
       nombre: dataToTest.nombre,
       apellido: dataToTest.apellido,
@@ -52,5 +52,10 @@ describe("Testing CRUD operations in repoAdmins", () => {
   test("Deberia eliminarse el admin segun su id", async () => {
     const res = await repo.deleteByID({ id: dataToTest.id });
     expect(res.wasRemoved).toBeTruthy();
+  });
+
+  test("Deberia eliminarse solo un admin según su id", async () => {
+    const res = await repo.deleteByIDs({ ids: [dataToTest.id] });
+    expect(res.removed).toEqual(1);
   });
 });

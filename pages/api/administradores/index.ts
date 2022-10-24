@@ -9,6 +9,10 @@ type GetAdminsResponse = {
   url: string;
 }[];
 
+type DeleteAdminsResponse = {
+  removed: number;
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -18,7 +22,7 @@ export default async function handler(
   try {
     switch (method) {
       case "OPTIONS":
-        res.setHeader("Allow", "HEAD, GET ");
+        res.setHeader("Allow", "HEAD, GET, DELETE ");
         res.status(200).end();
         break;
       case "HEAD":
@@ -26,6 +30,9 @@ export default async function handler(
         break;
       case "GET":
         await getAdmins(req, res);
+        break;
+      case "DELETE":
+        await deleteAdmins(req, res);
         break;
       default:
         res.status(405).json({});
@@ -45,5 +52,14 @@ const getAdmins = async (
     ...admin,
     url: `${process.env.APIURL}/administrador/${admin.id}`,
   }));
+  res.status(200).json(response);
+};
+
+const deleteAdmins = async (
+  req: NextApiRequest,
+  res: NextApiResponse<DeleteAdminsResponse>
+) => {
+  const { ids } = req.body;
+  const response = await repoAdmins.deleteByIDs({ ids });
   res.status(200).json(response);
 };

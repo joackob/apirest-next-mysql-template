@@ -1,16 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { repoDonadores } from "@/lib/RepoDonadores";
 
-interface DonorApiRequest extends NextApiRequest {
-  body: {
-    nombre: string;
-    apellido: string;
-    dni: string;
-    email: string;
-    telefono: string;
-  };
-}
-
 type PostDonorResponse = {
   id: number;
   url: string;
@@ -46,7 +36,7 @@ export default async function handler(
 }
 
 const createAdmin = async (
-  req: DonorApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse<PostDonorResponse>
 ) => {
   const donor = await repoDonadores.save(req.body);
