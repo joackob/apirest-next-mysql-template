@@ -17,7 +17,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  res.setHeader("Content-Type", "aplication/json");
   const { method } = req;
   try {
     switch (method) {

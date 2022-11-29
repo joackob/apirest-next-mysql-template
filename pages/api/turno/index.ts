@@ -10,7 +10,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  res.setHeader("Content-Type", "aplication/json");
   const { method } = req;
 
   try {
@@ -30,7 +29,8 @@ export default async function handler(
         break;
     }
   } catch (error) {
-    console.log(typeof error);
+    console.log(error);
+    console.log(req.body);
     res.status(500).json({});
   }
 }
