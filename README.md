@@ -42,7 +42,7 @@ Procurar tener actualizado `node.js` a la versión `lts`. Si desea asegurarse, p
 
 Se puede usar el archivo `.env` para configurar estas variables de entorno en testing y desarrollo. Solo se debe ejecutar el comando `cp .env.example .env`.
 
-## Características
+## Tecnologias usadas
 
 - [TypeScript](https://www.typescriptlang.org/)
 - [NextJS](https://nextjs.org/)
